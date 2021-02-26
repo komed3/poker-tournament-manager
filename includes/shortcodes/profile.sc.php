@@ -8,7 +8,7 @@
             return ptm_cs_profile_list();
         
         $profile = $wpdb->get_row('
-            SELECT  *
+            SELECT  *, ( p_payout - p_buyin ) AS balance
             FROM    ' . $wpdb->prefix . 'profile
             WHERE   p_id = ' . $_GET['id']
         );
@@ -24,16 +24,16 @@
                         <span>' . number_format_i18n( $profile->p_tournaments ) . '</span>
                     </div>
                     <div>
-                        <h3>' . __( 'buyin cash', 'ptm' ) . '</h3>
+                        <h3>' . __( 'buy in cash', 'ptm' ) . '</h3>
                         <span>' . _ptm_cash( $profile->p_buyin ) . '</span>
                     </div>
                     <div>
-                        <h3>' . __( 'all time payout', 'ptm' ) . '</h3>
+                        <h3>' . __( 'total payout', 'ptm' ) . '</h3>
                         <span>' . _ptm_cash( $profile->p_payout ) . '</span>
                     </div>
                     <div>
                         <h3>' . __( 'cash balance', 'ptm' ) . '</h3>
-                        <span>' . _ptm_cash( $profile->p_payout - $profile->p_buyin ) . '</span>
+                        <span>' . _ptm_cash( $profile->balance ) . '</span>
                     </div>
                 </div>
             </div>
@@ -49,23 +49,40 @@
         $limit = !isset( $_GET['limit'] ) || !is_numeric( $_GET['limit'] ) ? 50 : $_GET['limit'];
         
         $list = [];
+        $i = 0;
         
         foreach( $wpdb->get_results('
-            SELECT  p_id, p_name
-            FROM    ' . $wpdb->prefix . 'profile
-            LIMIT   ' . $offset . ', ' . $limit
+            SELECT      *, ( p_payout - p_buyin ) AS balance
+            FROM        ' . $wpdb->prefix . 'profile
+            ORDER BY    balance DESC
+            LIMIT       ' . $offset . ', ' . $limit
         ) as $profile ) {
             
-            $list[] = '<a href="?id=' . $profile->p_id . '">' . $profile->p_name . '</a>';
+            $list[] = '<tr>
+                <td>#' . ( $offset + ++$i ) . '</td>
+                <td><a href="?id=' . $profile->p_id . '">' . $profile->p_name . '</a></td>
+                <td>' . _ptm_cash( $profile->p_payout ) . '</td>
+                <td>' . _ptm_cash( $profile->balance ) . '</td>
+            </tr>';
             
         }
         
         return _ptm( '
             <div class="ptm_profile_list_header ptm_header">
-                <h1>' . __( 'profiles', 'ptm' ) . '</h1>
+                <h1>' . ucfirst( __( 'profiles', 'ptm' ) ) . '</h1>
             </div>
             <div class="ptm_profile_list">
-                <ul><li>' . implode( '</li><li>', $list ) . '</li></ul>
+                <table class="ptm_list">
+                    <thead>
+                        <tr>
+                            <th>' . __( 'rank', 'ptm' ) . '</th>
+                            <th>' . __( 'profile', 'ptm' ) . '</th>
+                            <th>' . __( 'total payout', 'ptm' ) . '</th>
+                            <th>' . __( 'cash balance', 'ptm' ) . '</th>
+                        </tr>
+                    </thead>
+                    <tbody>' . implode( '', $list ) . '</tbody>
+                </table>
             </div>
         ', 'ptm_profile_list_grid' );
         
