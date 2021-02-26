@@ -13,11 +13,11 @@
             WHERE   p_id = ' . $_GET['id']
         );
         
-        return _ptm('
+        return _ptm( '
             <div class="ptm_profile_header ptm_header">
                 <h1>' . $profile->p_name . '</h1>
             </div>
-            <div class="ptm_profile_overview ptm_box">
+            <div class="ptm_profile_overview">
                 <div class="ptm_biglist">
                     <div>
                         <h3>' . __( 'tournaments', 'ptm' ) . '</h3>
@@ -37,13 +37,37 @@
                     </div>
                 </div>
             </div>
-        ');
+        ', 'ptm_profile_grid' );
         
     }
     
     function ptm_cs_profile_list() {
         
-        return _ptm( '...' );
+        global $wpdb;
+        
+        $offset = !isset( $_GET['offset'] ) || !is_numeric( $_GET['offset'] ) ? 0 : $_GET['offset'];
+        $limit = !isset( $_GET['limit'] ) || !is_numeric( $_GET['limit'] ) ? 50 : $_GET['limit'];
+        
+        $list = [];
+        
+        foreach( $wpdb->get_results('
+            SELECT  p_id, p_name
+            FROM    ' . $wpdb->prefix . 'profile
+            LIMIT   ' . $offset . ', ' . $limit
+        ) as $profile ) {
+            
+            $list[] = '<a href="?id=' . $profile->p_id . '">' . $profile->p_name . '</a>';
+            
+        }
+        
+        return _ptm( '
+            <div class="ptm_profile_list_header ptm_header">
+                <h1>' . __( 'profiles', 'ptm' ) . '</h1>
+            </div>
+            <div class="ptm_profile_list">
+                <ul><li>' . implode( '</li><li>', $list ) . '</li></ul>
+            </div>
+        ', 'ptm_profile_list_grid' );
         
     }
     
