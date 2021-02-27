@@ -88,18 +88,21 @@ rank::before {
     font-size: 0.7em;
 }
 
-/* ptm cash */
+/* ptm cash + stack */
 
+stack::before,
 cash b::before {
     padding-right: 0.2em;
     font-size: 0.8em;
 }
 
+stack.good::before,
 cash.good b::before {
     content: '▲';
     color: var( --ptm-good );
 }
 
+stack.bad::before,
 cash.bad b::before {
     content: '▼';
     color: var( --ptm-bad );
@@ -140,6 +143,20 @@ cash.bad b::before {
 
 .ptm_list tbody tr:nth-child( 2n+2 ) td {
     background-color: var( --ptm-lgray );
+}
+
+/* ptm list ranking */
+
+.ptm_list.ranking tbody tr:nth-child( 1 ) td {
+    font-size: 1.3em;
+}
+
+.ptm_list.ranking tbody tr:nth-child( 2 ) td {
+    font-size: 1.2em;
+}
+
+.ptm_list.ranking tbody tr:nth-child( 3 ) td {
+    font-size: 1.1em;
 }
 
 /* ptm biglist */

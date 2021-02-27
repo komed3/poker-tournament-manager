@@ -37,15 +37,18 @@
                         ' . $wpdb->prefix . 'tournament
             WHERE       cp_profile = ' . $profile->p_id . '
             AND         tm_id = cp_tournament
-            ORDER BY    tm_date DESC
+            ORDER BY    cp_rank ASC,
+                        cp_payout DESC,
+                        tm_date DESC
+            LIMIT       0, 50
         ' ) as $tm ) {
             
             $tournaments[] = '<tr>
                 <td>' . _ptm_link( 'tournament', $tm->tm_name, [ 'id' => $tm->tm_id ] ) . '</td>
+                <td>' . _ptm_date( $tm->tm_date ) . '</td>
                 <td>' . ( $tm->cp_rank == null ? '–' : _ptm_rank( $tm->cp_rank ) ) . '</td>
                 <td>' . _ptm_cash( $tm->tm_buyin + ( $tm->cp_buyins - 1 ) * $tm->tm_rebuy ) . '</td>
-                <td>' . ( $tm->cp_payout == null ? '–' : '#' . _ptm_cash( $tm->cp_payout ) ) . '</td>
-                <td>' . _ptm_date( $tm->tm_date ) . '</td>
+                <td>' . ( $tm->cp_payout == null ? '–' : _ptm_cash( $tm->cp_payout ) ) . '</td>
             </tr>';
             
         }
@@ -87,10 +90,10 @@
                     <thead>
                         <tr>
                             <th>' . __( 'tournament', 'ptm' ) . '</th>
+                            <th>' . __( 'date', 'ptm' ) . '</th>
                             <th>' . __( 'rank', 'ptm' ) . '</th>
                             <th>' . __( 'buy in', 'ptm' ) . '</th>
                             <th>' . __( 'payout', 'ptm' ) . '</th>
-                            <th>' . __( 'date', 'ptm' ) . '</th>
                         </tr>
                     </thead>
                     <tbody>' . implode( '', $tournaments ) . '</tbody>

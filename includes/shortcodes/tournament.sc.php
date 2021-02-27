@@ -39,6 +39,10 @@
                         <span>' . $tm->tm_status . '</span>
                     </div>
                     <div>
+                        <h3>' . __( 'competitors', 'ptm' ) . '</h3>
+                        <span>' . number_format_i18n( $competitors->cnt ) . '</span>
+                    </div>
+                    <div>
                         <h3>' . __( 'buy-in', 'ptm' ) . '</h3>
                         <span>' . _ptm_cash( $tm->tm_buyin ) . '</span>
                     </div>
@@ -47,24 +51,124 @@
                         <span>' . _ptm_cash( $tm->tm_rebuy ) . '</span>
                     </div>
                     <div>
-                        <h3>' . __( 'competitors', 'ptm' ) . '</h3>
-                        <span>' . number_format_i18n( $competitors->cnt ) . '</span>
-                    </div>
-                    <div>
                         <h3>' . __( 'total buy-in', 'ptm' ) . '</h3>
                         <span>' . _ptm_cash( $total_buyin ) . '</span>
+                    </div>
+                    <div>
+                        <h3>' . __( 'price pool', 'ptm' ) . '</h3>
+                        <span>' . _ptm_cash( $total_payout ) . '</span>
                     </div>
                     <div>
                         <h3>' . __( 'payout pct', 'ptm' ) . '</h3>
                         <span>' . number_format_i18n( $tm->tm_payout_pct, 2 ) . '%</span>
                     </div>
-                    <div>
-                        <h3>' . __( 'total payout', 'ptm' ) . '</h3>
-                        <span>' . _ptm_cash( $total_payout ) . '</span>
-                    </div>
                 </div>
             </div>
+            ' . ptm_cs_tournament_payout( $tm ) . '
+            ' . ptm_cs_tournament_chiplead( $tm ) . '
         ', 'ptm_tournament_grid ptm_page' );
+        
+    }
+    
+    function ptm_cs_tournament_payout( $tm ) {
+        
+        global $wpdb;
+        
+        $list = [];
+        
+        foreach( $wpdb->get_results( '
+            SELECT      *
+            FROM        ' . $wpdb->prefix . 'competitor,
+                        ' . $wpdb->prefix . 'profile
+            WHERE       cp_tournament = ' . $tm->tm_id . '
+            AND         p_id = cp_profile
+            AND         cp_payout IS NOT NULL
+            ORDER BY    cp_rank ASC,
+                        cp_payout DESC
+        ' ) as $profile ) {
+            
+            $buyin = $tm->tm_buyin + ( $profile->cp_buyins - 1 ) * $tm->tm_rebuy;
+            
+            $list[] = '<tr>
+                <td>' . _ptm_rank( $profile->cp_rank ) . '</td>
+                <td>' . _ptm_link( 'profile', $profile->p_name, [ 'id' => $profile->p_id ] ) . '</td>
+                <td>' . _ptm_cash( $buyin ) . '</td>
+                <td>' . _ptm_cash( $profile->cp_payout ) . '</td>
+                <td>1:' . number_format_i18n( $profile->cp_payout / $buyin ) . '</td>
+            </tr>';
+            
+        }
+        
+        if( count( $list ) == 0 )
+            return '';
+        
+        return '<div class="ptm_tournament_payout">
+            <h3>' . __( 'payouts', 'ptm' ) . '</h3>
+            <table class="ptm_list ranking">
+                <thead>
+                    <tr>
+                        <th>' . __( 'rank', 'ptm' ) . '</th>
+                        <th>' . __( 'profile', 'ptm' ) . '</th>
+                        <th>' . __( 'buy-in', 'ptm' ) . '</th>
+                        <th>' . __( 'payout', 'ptm' ) . '</th>
+                        <th>' . __( 'profit rate', 'ptm' ) . '</th>
+                    </tr>
+                </thead>
+                <tbody>' . implode( '', $list ) . '</tbody>
+            </table>
+        </div>';
+        
+    }
+    
+    function ptm_cs_tournament_chiplead( $tm ) {
+        
+        global $wpdb;
+        
+        $total_stack = $wpdb->get_row( '
+            SELECT  SUM( cp_stack ) AS stack
+            FROM    ' . $wpdb->prefix . 'competitor
+            WHERE   cp_tournament = ' . $tm->tm_id . '
+        ' )->stack;
+        
+        $list = [];
+        
+        foreach( $wpdb->get_results( '
+            SELECT      *
+            FROM        ' . $wpdb->prefix . 'competitor,
+                        ' . $wpdb->prefix . 'profile
+            WHERE       cp_tournament = ' . $tm->tm_id . '
+            AND         p_id = cp_profile
+            AND         cp_payout IS NULL
+            AND         cp_stack > 0
+            ORDER BY    cp_stack DESC
+        ' ) as $profile ) {
+            
+            $list[] = '<tr>
+                <td>' . _ptm_link( 'profile', $profile->p_name, [ 'id' => $profile->p_id ] ) . '</td>
+                <td>' . _ptm_stack( $profile->cp_stack ) . '</td>
+                <td>' . _ptm_stack( $profile->cp_stack - $tm->tm_stack, true ) . '</td>
+                <td>' . number_format_i18n( $profile->cp_stack / $total_stack * 100, 1 ) . '%</td>
+            </tr>';
+            
+        }
+        
+        if( count( $list ) == 0 )
+            return '';
+        
+        return '<div class="ptm_tournament_chiplead">
+            <h3>' . __( 'chiplead', 'ptm' ) . '</h3>
+            <table class="ptm_list ranking">
+                <thead>
+                    <tr>
+                        <th>' . __( 'profile', 'ptm' ) . '</th>
+                        <th>' . __( 'stack', 'ptm' ) . '</th>
+                        <th>' . __( 'change', 'ptm' ) . '</th>
+                        <th>' . __( 'pct', 'ptm' ) . '</th>
+                    </tr>
+                </thead>
+                <tbody>' . implode( '', $list ) . '</tbody>
+            </table>
+        </div>';
         
     }
     
@@ -104,8 +208,8 @@
             $list[] = '<tr>
                 <td>' . _ptm_link( 'tournament', $tm->tm_name, [ 'id' => $tm->tm_id ] ) . '</td>
                 <td>' . _ptm_date( $tm->tm_date ) . '</td>
-                <td>' . _ptm_cash( $tm->tm_buyin ) . '</td>
                 <td>' . number_format_i18n( $competitors->cnt ) . '</td>
+                <td>' . _ptm_cash( $tm->tm_buyin ) . '</td>
                 <td>' . _ptm_cash( $total_payout ) . '</td>
             </tr>';
             
@@ -122,9 +226,9 @@
                         <tr>
                             <th>' . __( 'tournament', 'ptm' ) . '</th>
                             <th>' . __( 'date', 'ptm' ) . '</th>
-                            <th>' . __( 'buy-in', 'ptm' ) . '</th>
                             <th>' . __( 'competitors', 'ptm' ) . '</th>
-                            <th>' . __( 'total payout', 'ptm' ) . '</th>
+                            <th>' . __( 'buy-in', 'ptm' ) . '</th>
+                            <th>' . __( 'price pool', 'ptm' ) . '</th>
                         </tr>
                     </thead>
                     <tbody>' . implode( '', $list ) . '</tbody>

@@ -42,11 +42,30 @@
         
     }
     
+    function _ptm_pow2sfx(
+        int $pow10
+    ) {
+        
+        return [
+            __( '', 'ptm' ), __( 'T', 'ptm' ), __( 'M', 'ptm' ),
+            __( 'B', 'ptm' ), __( 'T', 'ptm' ), __( 'Q', 'ptm' )
+        ][ $pow10 ];
+        
+    }
+    
     function _ptm_rank(
         int $rank = 1
     ) {
         
         return '<rank title="' . __( 'rank no ', 'ptm' ) . number_format_i18n( $rank ) . '">' . number_format_i18n( $rank ) . '</rank>';
+        
+    }
+    
+    function _ptm_change(
+        float $number = 0
+    ) {
+        
+        return ( $number > 0 ? 'good' : ( $number < 0 ? 'bad' : '' ) );
         
     }
     
@@ -57,13 +76,25 @@
         
         $pow10 = floor( (int) ( log10( abs( $cash ) ) ) / 3 );
         
-        return '<cash class="' . ( $cash < 0 ? 'bad' : 'good' ) . '" title="' . _ptm_opt( 'currency', 'USD' ) . ' ' . number_format_i18n( $cash, $digits ) . '">' .
+        return '<cash class="' . _ptm_change( $cash ) . '" title="' . _ptm_opt( 'currency', 'USD' ) . ' ' . number_format_i18n( $cash, $digits ) . '">' .
             _ptm_opt( 'currency', 'USD' ) . '&nbsp;<b>' .
-            number_format_i18n( abs( $cash ) / pow( 10, $pow10 * 3 ), $digits ) . '&nbsp;' . [
-                __( '', 'ptm' ), __( 'T', 'ptm' ), __( 'M', 'ptm' ),
-                __( 'B', 'ptm' ), __( 'T', 'ptm' ), __( 'Q', 'ptm' )
-            ][ $pow10 ] .
+            number_format_i18n( abs( $cash ) / pow( 10, $pow10 * 3 ), $digits ) . '&nbsp;' .
+            _ptm_pow2sfx( $pow10 ) .
         '</b></cash>';
+        
+    }
+    
+    function _ptm_stack(
+        float $stack = 0,
+        bool $change = false
+    ) {
+        
+        $pow10 = floor( (int) ( log10( abs( $stack ) ) ) / 3 );
+        
+        return '<stack class="' . ( $change ? _ptm_change( $stack ) : '' ) . '" title="' . number_format_i18n( $stack, 0 ) . '">$&nbsp;' .
+            number_format_i18n( abs( $stack ) / pow( 10, $pow10 * 3 ), 1 ) . '&nbsp;' .
+            _ptm_pow2sfx( $pow10 ) .
+        '</stack>';
         
     }
     
