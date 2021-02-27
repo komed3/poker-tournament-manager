@@ -5,8 +5,10 @@
         string $classes = ''
     ) {
         
-        wp_enqueue_style( 'ptm_css', __ptm_path . 'css/style.css' );
-        wp_enqueue_script( 'ptm_js', __ptm_path . 'js/functions.js', [ 'jquery' ] );
+        wp_enqueue_style( 'ptm.css.global', __ptm_path . 'css/style.css' );
+        
+        wp_enqueue_script( 'ptm.js.global', __ptm_path . 'js/functions.js', [ 'jquery' ] );
+        wp_enqueue_script( 'highstock', 'https://code.highcharts.com/stock/highstock.js', [ 'jquery' ] );
         
         return '<div class="ptm_container ' . $classes . '">' . $content . '</div>';
         
@@ -23,7 +25,7 @@
     
     function _ptm_cash(
         float $cash = 0,
-        int $digits = 1
+        int $digits = 0
     ) {
         
         $pow10 = floor( (int) ( log10( abs( $cash ) ) ) / 3 );
@@ -35,6 +37,15 @@
                 __( 'B', 'ptm' ), __( 'T', 'ptm' ), __( 'Q', 'ptm' )
             ][ $pow10 ] .
         '</b></cash>';
+        
+    }
+    
+    function _ptm_date(
+        string $timestring,
+        $format = null
+    ) {
+        
+        return date_i18n( !is_string( $format ) ? get_option( 'date_format' ) : $format, $timestring );
         
     }
     

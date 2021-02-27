@@ -13,8 +13,48 @@
             WHERE   p_id = ' . $_GET['id']
         );
         
+        $cash = [];
+        
+        foreach( $wpdb->get_results( '
+            SELECT      *
+            FROM        ' . $wpdb->prefix . 'cash
+            WHERE       c_profile = ' . $profile->p_id . '
+            ORDER BY    c_touched ASC
+        ' ) as $value ) {
+            
+            $cash[] = [
+                strtotime( $value->c_touched ) * 1000,
+                $value->c_value
+            ];
+            
+        }
+        
+        $tournaments = [];
+        
+        foreach( $wpdb->get_results( '
+            SELECT      *
+            FROM        ' . $wpdb->prefix . 'competitor,
+                        ' . $wpdb->prefix . 'tournament
+            WHERE       cp_profile = ' . $profile->p_id . '
+            AND         tm_id = cp_tournament
+            ORDER BY    tm_date DESC
+        ' ) as $tm ) {
+            
+            $tournaments[] = '<tr>
+                <td><a href="">' . $tm->tm_name . '</a></td>
+                <td>' . ( $tm->cp_rank == null ? '–' : '#' . $tm->cp_rank ) . '</td>
+                <td>' . _ptm_cash( $tm->tm_buyin + ( $tm->cp_buyins - 1 ) * $tm->tm_rebuyin ) . '</td>
+                <td>' . ( $tm->cp_payout == null ? '–' : '#' . _ptm_cash( $tm->cp_payout ) ) . '</td>
+                <td>' . _ptm_date( $tm->tm_date ) . '</td>
+            </tr>';
+            
+        }
+        
+        wp_enqueue_script( 'ptm.js.profile', __ptm_path . 'js/profile.js', [ 'jquery', 'highstock', 'ptm.js.global' ] );
+        
         return _ptm( '
             <div class="ptm_profile_header ptm_header">
+                <a href="' . get_page_link() . '" class="ptm_backlink">' . __( 'back', 'ptm' ) . '</a>
                 <h1>' . $profile->p_name . '</h1>
             </div>
             <div class="ptm_profile_overview">
@@ -37,7 +77,26 @@
                     </div>
                 </div>
             </div>
-        ', 'ptm_profile_grid' );
+            <div class="ptm_profile_cash">
+                <h3>' . __( 'realtime cash', 'ptm' ) . '</h3>
+                <div id="ptm_chart_cash" data-cash="' . json_encode( $cash, JSON_NUMERIC_CHECK ) . '"></div>
+            </div>
+            <div class="ptm_profile_tournaments">
+                <h3>' . __( 'played tournaments', 'ptm' ) . '</h3>
+                <table class="ptm_list">
+                    <thead>
+                        <tr>
+                            <th>' . __( 'tournament', 'ptm' ) . '</th>
+                            <th>' . __( 'rank', 'ptm' ) . '</th>
+                            <th>' . __( 'buy in', 'ptm' ) . '</th>
+                            <th>' . __( 'payout', 'ptm' ) . '</th>
+                            <th>' . __( 'date', 'ptm' ) . '</th>
+                        </tr>
+                    </thead>
+                    <tbody>' . implode( '', $tournaments ) . '</tbody>
+                </table>
+            </div>
+        ', 'ptm_profile_grid ptm_page' );
         
     }
     
