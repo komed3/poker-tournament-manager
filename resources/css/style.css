@@ -1,13 +1,58 @@
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@100;300;400;600;800&display=swap');
 
 :root {
+    --ptm-text: #343434;
+    --ptm-bg: #ffffff;
+    
+    --ptm-site-bg: #edebe9 linear-gradient( to bottom, #dbd7d1, #edebe9 120px ) no-repeat;
+    --ptm-box-shadow: 0 2px 2px 0 rgba( 0, 0, 0, 0.14 ),
+                      0 3px 1px -2px rgba( 0, 0, 0, 0.2 ),
+                      0 1px 5px 0 rgba( 0, 0, 0, 0.12 );
+    
+    --ptm-lgray: #f5f6f7;
+    --ptm-mgray: #c6c7c8;
+    
+    --ptm-hl1: #006699;
+    --ptm-hl2: #5599cc;
+    
     --ptm-good: #448800;
     --ptm-bad: #bb3300;
 }
 
+body {
+    margin: 0;
+    height: 100%;
+    background: var( --ptm-site-bg );
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+.ptm_container {
+    margin: 3.2em auto 2.2em auto;
+}
+
 .ptm_container * {
     line-height: 1.2;
+    text-decoration: inherit !important;
     font-family: 'Work Sans', sans-serif;
+    color: var( --ptm-text );
+}
+
+.ptm_container a:link,
+.ptm_container a:visited {
+    color: var( --ptm-hl1 );
+}
+
+.ptm_container a:hover {
+    color: var( --ptm-hl2 );
+}
+
+/* ptm page */
+
+.ptm_page {
+    padding: 1.6em;
+    background: var( --ptm-bg );
+    box-shadow: var( --ptm-box-shadow );
 }
 
 /* ptm cash */
@@ -30,8 +75,38 @@ cash.bad b::before {
 /* ptm header */
 
 .ptm_header h1 {
-    margin: 1em 0;
+    margin: 0 0 1em 0;
     font-size: 2.2em;
+}
+
+/* ptm pager */
+
+.ptm_pager button {
+    background: var( --ptm-lgray );
+}
+
+.ptm_pager button:disabled {
+    pointer-events: none;
+    color: var( --ptm-mgray );
+}
+
+.ptm_pager button:hover {
+    background: var( --ptm-mgray );
+}
+
+.ptm_pager span {
+    padding: 0 1em;
+}
+
+/* ptm list */
+
+.ptm_list thead tr th {
+    text-transform: uppercase;
+    font-size: 0.75em;
+}
+
+.ptm_list tbody tr:nth-child( 2n+2 ) td {
+    background-color: var( --ptm-lgray );
 }
 
 /* ptm biglist */

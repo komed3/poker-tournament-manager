@@ -5,7 +5,8 @@
         string $classes = ''
     ) {
         
-        wp_enqueue_style( 'ptm_style', __ptm_path . 'css/style.css' );
+        wp_enqueue_style( 'ptm_css', __ptm_path . 'css/style.css' );
+        wp_enqueue_script( 'ptm_js', __ptm_path . 'js/functions.js', [ 'jquery' ] );
         
         return '<div class="ptm_container ' . $classes . '">' . $content . '</div>';
         
@@ -34,6 +35,34 @@
                 __( 'B', 'ptm' ), __( 'T', 'ptm' ), __( 'Q', 'ptm' )
             ][ $pow10 ] .
         '</b></cash>';
+        
+    }
+    
+    function _ptm_pager(
+        int $offset,
+        int $limit,
+        int $max
+    ) {
+        
+        return '<div class="ptm_pager" data-limit="' . $limit . '">
+            <button data-nav="first" ' . ( $offset == 0 ? 'disabled' : 'data-offset="0"' ) . '>
+                ' . __( 'first', 'ptm' ) . '
+            </button>
+            <button data-nav="prev" ' . ( $offset == 0 ? 'disabled' : 'data-offset="' . ( $offset - $limit ) . '"' ) . '>
+                ' . __( 'prev', 'ptm' ) . '
+            </button>
+            <span>
+                ' . number_format_i18n( $offset + 1 ) . __( '–', 'ptm' ) .
+                    number_format_i18n( $offset + $limit ) . __( ' of ', 'ptm' ) .
+                    number_format_i18n( $max ) . '
+            </span>
+            <button data-nav="next" ' . ( $offset + $limit >= $max ? 'disabled' : 'data-offset="' . ( $offset + $limit ) . '"' ) . '>
+                ' . __( 'next', 'ptm' ) . '
+            </button>
+            <button data-nav="last" ' . ( $offset + $limit >= $max ? 'disabled' : 'data-offset="' . ( floor( ( $max - 1 ) / $limit ) * $limit ) . '"' ) . '>
+                ' . __( 'last', 'ptm' ) . '
+            </button>
+        </div>';
         
     }
     

@@ -7,7 +7,7 @@
         if( !isset( $_GET['id'] ) )
             return ptm_cs_profile_list();
         
-        $profile = $wpdb->get_row('
+        $profile = $wpdb->get_row( '
             SELECT  *, ( p_payout - p_buyin ) AS balance
             FROM    ' . $wpdb->prefix . 'profile
             WHERE   p_id = ' . $_GET['id']
@@ -46,12 +46,19 @@
         global $wpdb;
         
         $offset = !isset( $_GET['offset'] ) || !is_numeric( $_GET['offset'] ) ? 0 : $_GET['offset'];
-        $limit = !isset( $_GET['limit'] ) || !is_numeric( $_GET['limit'] ) ? 50 : $_GET['limit'];
+        $limit = !isset( $_GET['limit'] ) || !is_numeric( $_GET['limit'] ) ? 25 : $_GET['limit'];
+        
+        $max = $wpdb->get_row( '
+            SELECT  COUNT( p_id ) AS cnt
+            FROM    ' . $wpdb->prefix . 'profile
+        ' )->cnt;
+        
+        $pager = _ptm_pager( $offset, $limit, $max );
         
         $list = [];
         $i = 0;
         
-        foreach( $wpdb->get_results('
+        foreach( $wpdb->get_results( '
             SELECT      *, ( p_payout - p_buyin ) AS balance
             FROM        ' . $wpdb->prefix . 'profile
             ORDER BY    balance DESC
@@ -71,6 +78,7 @@
             <div class="ptm_profile_list_header ptm_header">
                 <h1>' . ucfirst( __( 'profiles', 'ptm' ) ) . '</h1>
             </div>
+            ' . $pager . '
             <div class="ptm_profile_list">
                 <table class="ptm_list">
                     <thead>
@@ -84,7 +92,8 @@
                     <tbody>' . implode( '', $list ) . '</tbody>
                 </table>
             </div>
-        ', 'ptm_profile_list_grid' );
+            ' . $pager . '
+        ', 'ptm_profile_list_grid ptm_page' );
         
     }
     
