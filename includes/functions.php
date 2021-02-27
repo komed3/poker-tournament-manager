@@ -42,6 +42,14 @@
         
     }
     
+    function _ptm_rank(
+        int $rank = 1
+    ) {
+        
+        return '<rank title="' . __( 'rank no ', 'ptm' ) . number_format_i18n( $rank ) . '">' . number_format_i18n( $rank ) . '</rank>';
+        
+    }
+    
     function _ptm_cash(
         float $cash = 0,
         int $digits = 0
@@ -99,7 +107,7 @@
             </button>
             <span>
                 ' . number_format_i18n( $offset + 1 ) . __( '–', 'ptm' ) .
-                    number_format_i18n( $offset + $limit ) . __( ' of ', 'ptm' ) .
+                    number_format_i18n( min( $max, $offset + $limit ) ) . __( ' of ', 'ptm' ) .
                     number_format_i18n( $max ) . '
             </span>
             <button data-nav="next" ' . ( $offset + $limit >= $max ? 'disabled' : 'data-offset="' . ( $offset + $limit ) . '"' ) . '>

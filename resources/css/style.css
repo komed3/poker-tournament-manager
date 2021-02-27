@@ -77,6 +77,17 @@ body {
     float: right;
 }
 
+/* ptm rank */
+
+rank {
+    font-weight: bold;
+}
+rank::before {
+    content: '#';
+    padding-right: 0.05em;
+    font-size: 0.7em;
+}
+
 /* ptm cash */
 
 cash b::before {

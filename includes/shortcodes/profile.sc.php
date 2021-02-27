@@ -42,8 +42,8 @@
             
             $tournaments[] = '<tr>
                 <td>' . _ptm_link( 'tournament', $tm->tm_name, [ 'id' => $tm->tm_id ] ) . '</td>
-                <td>' . ( $tm->cp_rank == null ? '–' : '#' . $tm->cp_rank ) . '</td>
-                <td>' . _ptm_cash( $tm->tm_buyin + ( $tm->cp_buyins - 1 ) * $tm->tm_rebuyin ) . '</td>
+                <td>' . ( $tm->cp_rank == null ? '–' : _ptm_rank( $tm->cp_rank ) ) . '</td>
+                <td>' . _ptm_cash( $tm->tm_buyin + ( $tm->cp_buyins - 1 ) * $tm->tm_rebuy ) . '</td>
                 <td>' . ( $tm->cp_payout == null ? '–' : '#' . _ptm_cash( $tm->cp_payout ) ) . '</td>
                 <td>' . _ptm_date( $tm->tm_date ) . '</td>
             </tr>';
@@ -64,7 +64,7 @@
                         <span>' . number_format_i18n( $profile->p_tournaments ) . '</span>
                     </div>
                     <div>
-                        <h3>' . __( 'buy in cash', 'ptm' ) . '</h3>
+                        <h3>' . __( 'buy-in cash', 'ptm' ) . '</h3>
                         <span>' . _ptm_cash( $profile->p_buyin ) . '</span>
                     </div>
                     <div>
@@ -125,7 +125,7 @@
         ) as $profile ) {
             
             $list[] = '<tr>
-                <td>#' . ( $offset + ++$i ) . '</td>
+                <td>' . _ptm_rank( $offset + ++$i ) . '</td>
                 <td>' . _ptm_link( 'profile', $profile->p_name, [ 'id' => $profile->p_id ] ) . '</td>
                 <td>' . _ptm_cash( $profile->p_payout ) . '</td>
                 <td>' . _ptm_cash( $profile->balance ) . '</td>
