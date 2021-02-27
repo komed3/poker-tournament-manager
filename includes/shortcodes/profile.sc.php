@@ -2,7 +2,7 @@
     
     function ptm_sc_profile() {
         
-        global $wpdb;
+        global $wpdb, $ptm_path;
         
         if( !isset( $_GET['id'] ) )
             return ptm_cs_profile_list();
@@ -41,7 +41,7 @@
         ' ) as $tm ) {
             
             $tournaments[] = '<tr>
-                <td><a href="">' . $tm->tm_name . '</a></td>
+                <td>' . _ptm_link( 'tournament', $tm->tm_name, [ 'id' => $tm->tm_id ] ) . '</td>
                 <td>' . ( $tm->cp_rank == null ? '–' : '#' . $tm->cp_rank ) . '</td>
                 <td>' . _ptm_cash( $tm->tm_buyin + ( $tm->cp_buyins - 1 ) * $tm->tm_rebuyin ) . '</td>
                 <td>' . ( $tm->cp_payout == null ? '–' : '#' . _ptm_cash( $tm->cp_payout ) ) . '</td>
@@ -50,11 +50,11 @@
             
         }
         
-        wp_enqueue_script( 'ptm.js.profile', __ptm_path . 'js/profile.js', [ 'jquery', 'highstock', 'ptm.js.global' ] );
+        wp_enqueue_script( 'ptm.js.profile', $ptm_path . 'js/profile.js', [ 'jquery', 'highstock', 'ptm.js.global' ] );
         
         return _ptm( '
             <div class="ptm_profile_header ptm_header">
-                <a href="' . get_page_link() . '" class="ptm_backlink">' . __( 'back', 'ptm' ) . '</a>
+                ' . _ptm_link( 'profile', __( 'back', 'ptm' ), [], 'ptm_backlink' ) . '
                 <h1>' . $profile->p_name . '</h1>
             </div>
             <div class="ptm_profile_overview">
@@ -126,7 +126,7 @@
             
             $list[] = '<tr>
                 <td>#' . ( $offset + ++$i ) . '</td>
-                <td><a href="?id=' . $profile->p_id . '">' . $profile->p_name . '</a></td>
+                <td>' . _ptm_link( 'profile', $profile->p_name, [ 'id' => $profile->p_id ] ) . '</td>
                 <td>' . _ptm_cash( $profile->p_payout ) . '</td>
                 <td>' . _ptm_cash( $profile->balance ) . '</td>
             </tr>';

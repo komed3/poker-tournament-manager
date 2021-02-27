@@ -10,10 +10,13 @@
      * Version: 1.0.0
      * 
      */
-     
-     define( '__ptm_path', plugins_url( '/resources/', __FILE__ ) );
-     
-     require_once __DIR__ . '/includes/functions.php';
-     require_once __DIR__ . '/includes/shortcodes/index.php';
+    
+    $ptm_path = plugins_url( '/resources/', __FILE__ );
+    $ptm_pages = [];
+    
+    require_once __DIR__ . '/includes/functions.php';
+    require_once __DIR__ . '/includes/shortcodes/index.php';
+    
+    _ptm_init();
     
 ?>

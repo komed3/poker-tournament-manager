@@ -5,8 +5,8 @@ jQuery( document ).ready( function( $ ) {
     var ptm_chart_cash = Highcharts.stockChart( 'ptm_chart_cash', {
         
         series: [ {
-            name: "realtime cash",
-            type: "area",
+            name: 'realtime cash',
+            type: 'areaspline',
             threshold: 0,
             color: ptm.color.good,
             negativeColor: ptm.color.bad,

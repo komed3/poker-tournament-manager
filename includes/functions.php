@@ -1,13 +1,32 @@
 <?php
     
+    function _ptm_init() {
+        
+        global $wpdb, $ptm_pages;
+        
+        foreach( [ 'profile', 'tournament' ] as $page ) {
+            
+            $ptm_pages[ $page ] = $wpdb->get_row( '
+                SELECT  ID
+                FROM    ' . $wpdb->prefix . 'posts
+                WHERE   post_content LIKE "%[ptm_' . $page . ']%"
+                AND     post_status = "publish"
+            ' )->ID;
+            
+        }
+        
+    }
+    
     function _ptm(
         string $content = '',
         string $classes = ''
     ) {
         
-        wp_enqueue_style( 'ptm.css.global', __ptm_path . 'css/style.css' );
+        global $ptm_path;
         
-        wp_enqueue_script( 'ptm.js.global', __ptm_path . 'js/functions.js', [ 'jquery' ] );
+        wp_enqueue_style( 'ptm.css.global', $ptm_path . 'css/style.css' );
+        
+        wp_enqueue_script( 'ptm.js.global', $ptm_path . 'js/functions.js', [ 'jquery' ] );
         wp_enqueue_script( 'highstock', 'https://code.highcharts.com/stock/highstock.js', [ 'jquery' ] );
         
         return '<div class="ptm_container ' . $classes . '">' . $content . '</div>';
@@ -46,6 +65,22 @@
     ) {
         
         return date_i18n( !is_string( $format ) ? get_option( 'date_format' ) : $format, $timestring );
+        
+    }
+    
+    function _ptm_link(
+        string $page,
+        string $text,
+        array $args = [],
+        string $classes = ''
+    ) {
+        
+        global $ptm_pages;
+        
+        $query = http_build_query( $args );
+        
+        return !array_key_exists( $page, $ptm_pages ) ? $text :
+            '<a href="' . get_page_link( $ptm_pages[ $page ] ) . ( strlen( $query ) > 0 ? '?' . $query : '' ) . '" class="' . $classes . '">' . $text . '</a>';
         
     }
     
