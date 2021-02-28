@@ -2,21 +2,10 @@
     
     function ptm_sc_competitor() {
         
-        global $wpdb;
+        global $wpdb, $ptm_path;
         
         if( !isset( $_GET['tm'] ) )
             return ptm_cs_competitor_tournaments();
-        
-        else if( !isset( $_GET['id'] ) )
-            return ptm_cs_competitor_list();
-        
-        return '';
-        
-    }
-    
-    function ptm_cs_competitor_list() {
-        
-        global $wpdb;
         
         $tm = $wpdb->get_row( '
             SELECT  *
@@ -24,14 +13,101 @@
             WHERE   tm_id = ' . $_GET['tm']
         );
         
-        $offset = !isset( $_GET['offset'] ) || !is_numeric( $_GET['offset'] ) ? 0 : $_GET['offset'];
-        $limit = !isset( $_GET['limit'] ) || !is_numeric( $_GET['limit'] ) ? 25 : $_GET['limit'];
-        
         $max = $wpdb->get_row( '
             SELECT  COUNT( cp_profile ) AS cnt,
                     SUM( cp_stack ) AS stack
             FROM    ' . $wpdb->prefix . 'competitor
+            WHERE   cp_tournament = ' . $tm->tm_id
+        );
+        
+        if( !isset( $_GET['id'] ) )
+            return ptm_cs_competitor_list( $tm, $max );
+        
+        $profile = $wpdb->get_row( '
+            SELECT  *
+            FROM    ' . $wpdb->prefix . 'competitor,
+                    ' . $wpdb->prefix . 'profile
+            WHERE   cp_tournament = ' . $tm->tm_id . '
+            AND     cp_profile = ' . $_GET['id'] . '
+            AND     p_id = cp_profile
         ' );
+        
+        $buyin = $tm->tm_buyin + ( $profile->cp_buyins - 1 ) * $tm->tm_rebuy;
+        
+        $stack = [];
+        
+        foreach( $wpdb->get_results( '
+            SELECT      *
+            FROM        ' . $wpdb->prefix . 'stack
+            WHERE       st_profile = ' . $profile->p_id . '
+            AND         st_tournament = ' . $tm->tm_id . '
+            ORDER BY    st_touched ASC
+        ' ) as $st ) {
+            
+            $stack['stack'][] = [
+                strtotime( $st->st_touched ) * 1000,
+                $st->st_value
+            ];
+            
+            $stack['change'][] = [
+                strtotime( $st->st_touched ) * 1000,
+                $st->st_change
+            ];
+            
+        }
+        
+        wp_enqueue_script( 'ptm.js.competitor', $ptm_path . 'js/competitor.js', [ 'jquery', 'highstock', 'ptm.js.global' ] );
+        
+        return _ptm( '
+            <div class="ptm_competitor_header ptm_header">
+                ' . _ptm_link( 'competitor', __( 'back', 'ptm' ), [ 'tm' => $tm->tm_id ], 'ptm_button ptm_hlink' ) . '
+                <h1>' . _ptm_link( 'tournament', $tm->tm_name, [ 'id' => $tm->tm_id ] ) . ': ' .
+                        _ptm_link( 'profile', $profile->p_name, [ 'id' => $profile->p_id ] ) . '</h1>
+            </div>
+            <div class="ptm_competitor_overview">
+                <div class="ptm_biglist">
+                    <div>
+                        <h3>' . __( 'rank', 'ptm' ) . '</h3>
+                        <span>' . _ptm_rank( $profile->cp_rank ) . '</span>
+                    </div>
+                    <div>
+                        <h3>' . __( 'buy-in', 'ptm' ) . '</h3>
+                        <span>' . _ptm_cash( $buyin ) . '</span>
+                    </div>
+                    <div>
+                        <h3>' . __( 'payout', 'ptm' ) . '</h3>
+                        <span>' . ( $profile->cp_payout == null ? '–' : _ptm_cash( $profile->cp_payout ) ) . '</span>
+                    </div>
+                    ' . ( $profile->cp_stack == 0
+                            ? '<div>
+                                   <h3>' . __( 'stack', 'ptm' ) . '</h3>
+                                   <span>' .  _ptm_msg( 'e' ) . '</span>
+                               </div>'
+                            : '<div>
+                                   <h3>' . __( 'stack', 'ptm' ) . '</h3>
+                                   <span>' . _ptm_stack( $profile->cp_stack ) . '</span>
+                               </div>
+                               <div>
+                                   <h3>' . __( 'stack pct', 'ptm' ) . '</h3>
+                                   <span>' . number_format_i18n( $profile->cp_stack / $max->stack * 100, 1 ) . '&nbsp;%</span>
+                               </div>' ) . '
+                </div>
+            </div>
+            <div class="ptm_competitor_stack">
+                <h3>' . __( 'realtime stack size', 'ptm' ) . '</h3>
+                <div id="ptm_chart_stack" data-stack="' . json_encode( $stack['stack'], JSON_NUMERIC_CHECK ) . '" data-change="' .
+                                                          json_encode( $stack['change'], JSON_NUMERIC_CHECK ) . '"></div>
+            </div>
+        ', 'ptm_competitor_grid ptm_page' );
+        
+    }
+    
+    function ptm_cs_competitor_list( $tm, $max ) {
+        
+        global $wpdb;
+        
+        $offset = !isset( $_GET['offset'] ) || !is_numeric( $_GET['offset'] ) ? 0 : $_GET['offset'];
+        $limit = !isset( $_GET['limit'] ) || !is_numeric( $_GET['limit'] ) ? 25 : $_GET['limit'];
         
         $pager = _ptm_pager( $offset, $limit, $max->cnt, '&tm=' . $tm->tm_id );
         
@@ -137,11 +213,11 @@
         }
         
         return _ptm( '
-            <div class="ptm_tournament_list_header ptm_header">
+            <div class="ptm_competitor_list_header ptm_header">
                 <h1>' . ucfirst( __( 'tournament competitors', 'ptm' ) ) . '</h1>
             </div>
             ' . $pager . '
-            <div class="ptm_tournament_list">
+            <div class="ptm_competitor_list">
                 <table class="ptm_list">
                     <thead>
                         <tr>
@@ -156,7 +232,7 @@
                 </table>
             </div>
             ' . $pager . '
-        ', 'ptm_tournament_list_grid ptm_page' );
+        ', 'ptm_competitor_list_grid ptm_page' );
         
     }
     

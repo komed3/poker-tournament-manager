@@ -188,3 +188,13 @@ cash.bad b::before {
 .ptm_biglist > div > span {
     font-size: 1.3em;
 }
+
+/* charts */
+
+#ptm_chart_cash {
+    height: 450px;
+}
+
+#ptm_chart_stack {
+    height: 700px;
+}
