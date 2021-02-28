@@ -25,7 +25,7 @@
         
         return _ptm( '
             <div class="ptm_tournament_header ptm_header">
-                ' . _ptm_link( 'tournament', __( 'back', 'ptm' ), [], 'ptm_backlink' ) . '
+                ' . _ptm_link( 'tournament', __( 'back', 'ptm' ), [], 'ptm_button ptm_hlink' ) . '
                 <h1>' . $tm->tm_name . '</h1>
             </div>
             <div class="ptm_profile_overview">
@@ -141,6 +141,7 @@
             AND         cp_payout IS NULL
             AND         cp_stack > 0
             ORDER BY    cp_stack DESC
+            LIMIT       0, 10
         ' ) as $profile ) {
             
             $list[] = '<tr>
@@ -217,6 +218,7 @@
         
         return _ptm( '
             <div class="ptm_tournament_list_header ptm_header">
+                ' . _ptm_link( 'tournament', __( 'new', 'ptm' ), [ 'id' => 'new' ], 'ptm_button ptm_hlink' ) . '
                 <h1>' . ucfirst( __( 'tournaments', 'ptm' ) ) . '</h1>
             </div>
             ' . $pager . '

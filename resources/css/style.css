@@ -62,19 +62,11 @@ body {
     box-shadow: var( --ptm-box-shadow );
 }
 
-/* ptm backlink */
+/* ptm hlink */
 
-.ptm_backlink {
-    font-size: 1.2em;
-}
-
-.ptm_backlink::before {
-    content: '◄';
-    padding-right: 0.2em;
-}
-
-.ptm_header .ptm_backlink {
+.ptm_hlink {
     float: right;
+    font-size: 1.2em;
 }
 
 /* ptm rank */
@@ -115,20 +107,29 @@ cash.bad b::before {
     font-size: 2.2em;
 }
 
-/* ptm pager */
+/* ptm button */
 
-.ptm_pager button {
+.ptm_button {
+    display: inline-block;
+    padding: 0.4em 0.8em;
+    text-transform: uppercase;
+    color: inherit !important;
     background: var( --ptm-lgray );
+    border-radius: 3px;
+    transition: color 250ms, background 250ms;
 }
 
-.ptm_pager button:disabled {
+.ptm_button:hover {
+    color: var( --ptm-bg ) !important;
+    background: var( --ptm-hl2 );
+}
+
+.ptm_button.disabled {
     pointer-events: none;
-    color: var( --ptm-mgray );
+    color: var( --ptm-mgray ) !important;
 }
 
-.ptm_pager button:hover {
-    background: var( --ptm-mgray );
-}
+/* ptm pager */
 
 .ptm_pager span {
     padding: 0 1em;

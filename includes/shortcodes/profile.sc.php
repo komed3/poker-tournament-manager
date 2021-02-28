@@ -57,7 +57,7 @@
         
         return _ptm( '
             <div class="ptm_profile_header ptm_header">
-                ' . _ptm_link( 'profile', __( 'back', 'ptm' ), [], 'ptm_backlink' ) . '
+                ' . _ptm_link( 'profile', __( 'back', 'ptm' ), [], 'ptm_button ptm_hlink' ) . '
                 <h1>' . $profile->p_name . '</h1>
             </div>
             <div class="ptm_profile_overview">
@@ -76,7 +76,7 @@
                     </div>
                     <div>
                         <h3>' . __( 'cash balance', 'ptm' ) . '</h3>
-                        <span>' . _ptm_cash( $profile->balance ) . '</span>
+                        <span>' . _ptm_cash( $profile->balance, 0, true ) . '</span>
                     </div>
                 </div>
             </div>
@@ -131,13 +131,14 @@
                 <td>' . _ptm_rank( $offset + ++$i ) . '</td>
                 <td>' . _ptm_link( 'profile', $profile->p_name, [ 'id' => $profile->p_id ] ) . '</td>
                 <td>' . _ptm_cash( $profile->p_payout ) . '</td>
-                <td>' . _ptm_cash( $profile->balance ) . '</td>
+                <td>' . _ptm_cash( $profile->balance, 0, true ) . '</td>
             </tr>';
             
         }
         
         return _ptm( '
             <div class="ptm_profile_list_header ptm_header">
+                ' . _ptm_link( 'profile', __( 'new', 'ptm' ), [ 'id' => 'new' ], 'ptm_button ptm_hlink' ) . '
                 <h1>' . ucfirst( __( 'profiles', 'ptm' ) ) . '</h1>
             </div>
             ' . $pager . '

@@ -71,12 +71,13 @@
     
     function _ptm_cash(
         float $cash = 0,
-        int $digits = 0
+        int $digits = 0,
+        bool $change = false
     ) {
         
         $pow10 = floor( (int) ( log10( abs( $cash ) ) ) / 3 );
         
-        return '<cash class="' . _ptm_change( $cash ) . '" title="' . _ptm_opt( 'currency', 'USD' ) . ' ' . number_format_i18n( $cash, $digits ) . '">' .
+        return '<cash class="' . ( $change ? _ptm_change( $cash ) : '' ) . '" title="' . _ptm_opt( 'currency', 'USD' ) . ' ' . number_format_i18n( $cash, $digits ) . '">' .
             _ptm_opt( 'currency', 'USD' ) . '&nbsp;<b>' .
             number_format_i18n( abs( $cash ) / pow( 10, $pow10 * 3 ), $digits ) . '&nbsp;' .
             _ptm_pow2sfx( $pow10 ) .
@@ -130,23 +131,19 @@
     ) {
         
         return '<div class="ptm_pager" data-limit="' . $limit . '">
-            <button data-nav="first" ' . ( $offset == 0 ? 'disabled' : 'data-offset="0"' ) . '>
-                ' . __( 'first', 'ptm' ) . '
-            </button>
-            <button data-nav="prev" ' . ( $offset == 0 ? 'disabled' : 'data-offset="' . ( $offset - $limit ) . '"' ) . '>
-                ' . __( 'prev', 'ptm' ) . '
-            </button>
+            <a href="?offset=0&limit=' . $limit . '" class="ptm_button ' . ( $offset == 0 ? 'disabled' : '' ) . '">
+                ' . __( 'first', 'ptm' ) . '</a>
+            <a href="?offset=' . ( $offset - $limit ) . '&limit=' . $limit . '" class="ptm_button ' . ( $offset == 0 ? 'disabled' : '' ) . '">
+                ' . __( 'prev', 'ptm' ) . '</a>
             <span>
                 ' . number_format_i18n( $offset + 1 ) . __( '–', 'ptm' ) .
                     number_format_i18n( min( $max, $offset + $limit ) ) . __( ' of ', 'ptm' ) .
                     number_format_i18n( $max ) . '
             </span>
-            <button data-nav="next" ' . ( $offset + $limit >= $max ? 'disabled' : 'data-offset="' . ( $offset + $limit ) . '"' ) . '>
-                ' . __( 'next', 'ptm' ) . '
-            </button>
-            <button data-nav="last" ' . ( $offset + $limit >= $max ? 'disabled' : 'data-offset="' . ( floor( ( $max - 1 ) / $limit ) * $limit ) . '"' ) . '>
-                ' . __( 'last', 'ptm' ) . '
-            </button>
+            <a href="?offset=' . ( $offset + $limit ) . '&limit=' . $limit . '" class="ptm_button ' . ( $offset + $limit >= $max ? 'disabled' : '' ) . '">
+                ' . __( 'next', 'ptm' ) . '</a>
+            <a href="?offset=' . ( floor( ( $max - 1 ) / $limit ) * $limit ) . '&limit=' . $limit . '" class="ptm_button ' . ( $offset + $limit >= $max ? 'disabled' : '' ) . '">
+                ' . __( 'last', 'ptm' ) . '</a>
         </div>';
         
     }
