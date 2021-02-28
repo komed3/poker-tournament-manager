@@ -4,7 +4,7 @@
         
         global $wpdb, $ptm_pages;
         
-        foreach( [ 'profile', 'tournament' ] as $page ) {
+        foreach( [ 'profile', 'tournament', 'table', 'competitor', 'level', 'payout' ] as $page ) {
             
             $ptm_pages[ $page ] = $wpdb->get_row( '
                 SELECT  ID

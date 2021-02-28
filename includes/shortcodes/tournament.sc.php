@@ -20,6 +20,13 @@
             WHERE   cp_tournament = ' . $tm->tm_id
         );
         
+        $cleft = $wpdb->get_row( '
+            SELECT  COUNT( cp_profile ) AS cnt
+            FROM    ' . $wpdb->prefix . 'competitor
+            WHERE   cp_tournament = ' . $tm->tm_id . '
+            AND     cp_stack > 0
+        ' )->cnt;
+        
         $total_buyin = $competitors->cnt * $tm->tm_buyin + ( $competitors->buyins - $competitors->cnt ) * $tm->tm_rebuy;
         $total_payout = $total_buyin * $tm->tm_payout_pct;
         
@@ -39,8 +46,8 @@
                         <span>' . $tm->tm_status . '</span>
                     </div>
                     <div>
-                        <h3>' . __( 'competitors', 'ptm' ) . '</h3>
-                        <span>' . number_format_i18n( $competitors->cnt ) . '</span>
+                        <h3>' . __( 'field', 'ptm' ) . '</h3>
+                        <span>' . $cleft . __( ' of ', 'ptm' ) . number_format_i18n( $competitors->cnt ) . '</span>
                     </div>
                     <div>
                         <h3>' . __( 'buy-in', 'ptm' ) . '</h3>
@@ -63,6 +70,15 @@
                         <span>' . number_format_i18n( $tm->tm_payout_pct, 2 ) . '%</span>
                     </div>
                 </div>
+            </div>
+            <div class="ptm_tournament_linklist">
+                <h3>' . __( 'manage tournament', 'ptm' ) . '</h3>
+                <ul>
+                    <li>' . _ptm_link( 'table', __( 'Tournament tables', 'ptm' ), [ 'tm' => $tm->tm_id ] ) . '</li>
+                    <li>' . _ptm_link( 'level', __( 'Levels and Blind structure', 'ptm' ), [ 'tm' => $tm->tm_id ] ) . '</li>
+                    <li>' . _ptm_link( 'competitor', __( 'Competitors', 'ptm' ), [ 'tm' => $tm->tm_id ] ) . '</li>
+                    <li>' . _ptm_link( 'payout', __( 'Payout spread', 'ptm' ), [ 'tm' => $tm->tm_id ] ) . '</li>
+                </ul>
             </div>
             ' . ptm_cs_tournament_payout( $tm ) . '
             ' . ptm_cs_tournament_chiplead( $tm ) . '
@@ -131,6 +147,7 @@
         ' )->stack;
         
         $list = [];
+        $i = 0;
         
         foreach( $wpdb->get_results( '
             SELECT      *
@@ -145,6 +162,7 @@
         ' ) as $profile ) {
             
             $list[] = '<tr>
+                <td>' . _ptm_rank( ++$i ) . '</td>
                 <td>' . _ptm_link( 'profile', $profile->p_name, [ 'id' => $profile->p_id ] ) . '</td>
                 <td>' . _ptm_stack( $profile->cp_stack ) . '</td>
                 <td>' . _ptm_stack( $profile->cp_stack - $tm->tm_stack, true ) . '</td>
@@ -161,6 +179,7 @@
             <table class="ptm_list ranking">
                 <thead>
                     <tr>
+                        <th>' . __( 'rank', 'ptm' ) . '</th>
                         <th>' . __( 'profile', 'ptm' ) . '</th>
                         <th>' . __( 'stack', 'ptm' ) . '</th>
                         <th>' . __( 'change', 'ptm' ) . '</th>
