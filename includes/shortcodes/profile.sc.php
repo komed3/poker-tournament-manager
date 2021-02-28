@@ -44,7 +44,8 @@
         ' ) as $tm ) {
             
             $tournaments[] = '<tr>
-                <td>' . _ptm_link( 'tournament', $tm->tm_name, [ 'id' => $tm->tm_id ] ) . '</td>
+                <td>' . _ptm_link( 'tournament', $tm->tm_name, [ 'id' => $tm->tm_id ] ) . ' [' .
+                        _ptm_link( 'competitor', '+', [ 'tm' => $tm->tm_id, 'id' => $profile->p_id ] ) . ']</td>
                 <td>' . _ptm_date( $tm->tm_date ) . '</td>
                 <td>' . ( $tm->cp_rank == null ? '–' : _ptm_rank( $tm->cp_rank ) ) . '</td>
                 <td>' . _ptm_cash( $tm->tm_buyin + ( $tm->cp_buyins - 1 ) * $tm->tm_rebuy ) . '</td>

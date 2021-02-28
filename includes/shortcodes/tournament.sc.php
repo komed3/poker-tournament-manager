@@ -107,7 +107,7 @@
             
             $list[] = '<tr>
                 <td>' . _ptm_rank( $profile->cp_rank ) . '</td>
-                <td>' . _ptm_link( 'profile', $profile->p_name, [ 'id' => $profile->p_id ] ) . '</td>
+                <td>' . _ptm_link( 'competitor', $profile->p_name, [ 'tm' => $tm->tm_id, 'id' => $profile->p_id ] ) . '</td>
                 <td>' . _ptm_cash( $buyin ) . '</td>
                 <td>' . _ptm_cash( $profile->cp_payout ) . '</td>
                 <td>1:' . number_format_i18n( $profile->cp_payout / $buyin ) . '</td>
@@ -124,7 +124,7 @@
                 <thead>
                     <tr>
                         <th>' . __( 'rank', 'ptm' ) . '</th>
-                        <th>' . __( 'profile', 'ptm' ) . '</th>
+                        <th>' . __( 'competitor', 'ptm' ) . '</th>
                         <th>' . __( 'buy-in', 'ptm' ) . '</th>
                         <th>' . __( 'payout', 'ptm' ) . '</th>
                         <th>' . __( 'profit rate', 'ptm' ) . '</th>
@@ -163,7 +163,7 @@
             
             $list[] = '<tr>
                 <td>' . _ptm_rank( ++$i ) . '</td>
-                <td>' . _ptm_link( 'profile', $profile->p_name, [ 'id' => $profile->p_id ] ) . '</td>
+                <td>' . _ptm_link( 'competitor', $profile->p_name, [ 'tm' => $tm->tm_id, 'id' => $profile->p_id ] ) . '</td>
                 <td>' . _ptm_stack( $profile->cp_stack ) . '</td>
                 <td>' . _ptm_stack( $profile->cp_stack - $tm->tm_stack, true ) . '</td>
                 <td>' . number_format_i18n( $profile->cp_stack / $total_stack * 100, 1 ) . '%</td>
@@ -180,7 +180,7 @@
                 <thead>
                     <tr>
                         <th>' . __( 'rank', 'ptm' ) . '</th>
-                        <th>' . __( 'profile', 'ptm' ) . '</th>
+                        <th>' . __( 'competitor', 'ptm' ) . '</th>
                         <th>' . __( 'stack', 'ptm' ) . '</th>
                         <th>' . __( 'change', 'ptm' ) . '</th>
                         <th>' . __( 'pct', 'ptm' ) . '</th>

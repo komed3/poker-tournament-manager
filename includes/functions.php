@@ -53,11 +53,25 @@
         
     }
     
-    function _ptm_rank(
-        int $rank = 1
+    function _ptm_rank( $rank ) {
+        
+        return !is_numeric( $rank ) ? '–' : '<rank title="' . __( 'rank no ', 'ptm' ) . number_format_i18n( $rank ) . '">' . number_format_i18n( $rank ) . '</rank>';
+        
+    }
+    
+    function _ptm_msg(
+        string $code = ''
     ) {
         
-        return '<rank title="' . __( 'rank no ', 'ptm' ) . number_format_i18n( $rank ) . '">' . number_format_i18n( $rank ) . '</rank>';
+        switch( $code ) {
+            
+            default:
+                return '';
+            
+            case 'e':
+                return '<span class="eliminated">eliminated</span>';
+            
+        }
         
     }
     
@@ -127,22 +141,27 @@
     function _ptm_pager(
         int $offset,
         int $limit,
-        int $max
+        int $max,
+        string $append = ''
     ) {
         
         return '<div class="ptm_pager" data-limit="' . $limit . '">
-            <a href="?offset=0&limit=' . $limit . '" class="ptm_button ' . ( $offset == 0 ? 'disabled' : '' ) . '">
+            <a href="?offset=0&limit=' . $limit . $append . '" class="ptm_button ' .
+                ( $offset == 0 ? 'disabled' : '' ) . '">
                 ' . __( 'first', 'ptm' ) . '</a>
-            <a href="?offset=' . ( $offset - $limit ) . '&limit=' . $limit . '" class="ptm_button ' . ( $offset == 0 ? 'disabled' : '' ) . '">
+            <a href="?offset=' . ( $offset - $limit ) . '&limit=' . $limit . $append . '" class="ptm_button ' .
+                ( $offset == 0 ? 'disabled' : '' ) . '">
                 ' . __( 'prev', 'ptm' ) . '</a>
             <span>
                 ' . number_format_i18n( $offset + 1 ) . __( '–', 'ptm' ) .
                     number_format_i18n( min( $max, $offset + $limit ) ) . __( ' of ', 'ptm' ) .
                     number_format_i18n( $max ) . '
             </span>
-            <a href="?offset=' . ( $offset + $limit ) . '&limit=' . $limit . '" class="ptm_button ' . ( $offset + $limit >= $max ? 'disabled' : '' ) . '">
+            <a href="?offset=' . ( $offset + $limit ) . '&limit=' . $limit . $append . '" class="ptm_button ' .
+                ( $offset + $limit >= $max ? 'disabled' : '' ) . '">
                 ' . __( 'next', 'ptm' ) . '</a>
-            <a href="?offset=' . ( floor( ( $max - 1 ) / $limit ) * $limit ) . '&limit=' . $limit . '" class="ptm_button ' . ( $offset + $limit >= $max ? 'disabled' : '' ) . '">
+            <a href="?offset=' . ( floor( ( $max - 1 ) / $limit ) * $limit ) . '&limit=' . $limit . $append . '" class="ptm_button ' .
+                ( $offset + $limit >= $max ? 'disabled' : '' ) . '">
                 ' . __( 'last', 'ptm' ) . '</a>
         </div>';
         
