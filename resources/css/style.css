@@ -106,6 +106,13 @@ cash.bad b::before {
     color: var( --ptm-bad );
 }
 
+/* ptm ordinal */
+
+ordinal[data-sfx]::after {
+    content: attr( data-sfx );
+    font-size: 0.7em;
+}
+
 /* ptm header */
 
 .ptm_header h1 {

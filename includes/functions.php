@@ -113,6 +113,17 @@
         
     }
     
+    function _ptm_ordinal(
+        int $number
+    ) {
+        
+        return $number == 0 ? '0' : '<ordinal data-sfx="' . [
+            0 => 'th', 1 => 'st', 2 => 'nd', 3 => 'rd', 4 => 'th',
+            5 => 'th', 6 => 'th', 7 => 'th', 8 => 'th', 9 => 'th'
+        ][ $number % 10 ] . '">' . $number . '</ordinal>';
+        
+    }
+    
     function _ptm_date(
         string $timestring,
         $format = null

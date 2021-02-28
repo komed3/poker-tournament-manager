@@ -32,6 +32,13 @@
             AND     p_id = cp_profile
         ' );
         
+        $stack_rank = $wpdb->get_row( '
+            SELECT  COUNT( cp_profile ) AS cnt
+            FROM    ' . $wpdb->prefix . 'competitor
+            WHERE   cp_tournament = ' . $tm->tm_id . '
+            AND     cp_stack > ' . $profile->cp_stack
+        )->cnt + 1;
+        
         $buyin = $tm->tm_buyin + ( $profile->cp_buyins - 1 ) * $tm->tm_rebuy;
         
         $stack = [];
@@ -90,6 +97,10 @@
                                <div>
                                    <h3>' . __( 'stack pct', 'ptm' ) . '</h3>
                                    <span>' . number_format_i18n( $profile->cp_stack / $max->stack * 100, 1 ) . '&nbsp;%</span>
+                               </div>
+                               <div>
+                                   <h3>' . __( 'stack rank', 'ptm' ) . '</h3>
+                                   <span>' . _ptm_ordinal( $stack_rank ) . __( ' in chips', 'ptm' ) . '</span>
                                </div>' ) . '
                 </div>
             </div>
