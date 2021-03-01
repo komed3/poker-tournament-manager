@@ -4,6 +4,13 @@ jQuery( document ).ready( function( $ ) {
     
     var ptm_chart_stack = Highcharts.stockChart( 'ptm_chart_stack', {
         
+        plotOptions: {
+            column: {
+                groupPadding: 0,
+                pointPadding: 0
+            }
+        },
+        
         series: [ {
             name: 'realtime stack size',
             type: 'areaspline',

@@ -41,7 +41,9 @@
         
         $buyin = $tm->tm_buyin + ( $profile->cp_buyins - 1 ) * $tm->tm_rebuy;
         
+        $range = [ 'win' => 0, 'loss' => 0, 'unplayed' => 0 ];
         $stack = [];
+        $hands = 0;
         
         foreach( $wpdb->get_results( '
             SELECT      *
@@ -50,6 +52,13 @@
             AND         st_tournament = ' . $tm->tm_id . '
             ORDER BY    st_touched ASC
         ' ) as $st ) {
+            
+            if( $st->st_hand != null ) {
+                
+                $range[ $st->st_flag == null ? 'unplayed' : $st->st_flag ]++;
+                $hands++;
+                
+            }
             
             $stack['stack'][] = [
                 strtotime( $st->st_touched ) * 1000,
@@ -62,6 +71,9 @@
             ];
             
         }
+        
+        if( $hands > 0 )
+            $range = array_map( function( $value ) use ( $hands ) { return $value / $hands * 100; }, $range );
         
         wp_enqueue_script( 'ptm.js.competitor', $ptm_path . 'js/competitor.js', [ 'jquery', 'highstock', 'ptm.js.global' ] );
         
@@ -104,6 +116,20 @@
                                </div>' ) . '
                 </div>
             </div>
+            ' . ( $hands > 0 ? '
+                    <div class="ptm_competitor_range">
+                        <div class="ptm_range">
+                            <div class="bar good" style="width: ' . $range['win'] . '%;" title="' . __( 'win', 'ptm' ) . '">
+                                <span>' . number_format_i18n( $range['win'], 1 ) . '&nbsp;%</span>
+                            </div>
+                            <div class="bar bad" style="width: ' . $range['loss'] . '%;" title="' . __( 'loss', 'ptm' ) . '">
+                                <span>' . number_format_i18n( $range['loss'], 1 ) . '&nbsp;%</span>
+                            </div>
+                            <div class="bar" style="width: ' . $range['unplayed'] . '%;" title="' . __( 'unplayed', 'ptm' ) . '">
+                                <span>' . number_format_i18n( $range['unplayed'], 1 ) . '&nbsp;%</span>
+                            </div>
+                        </div>
+                    </div>' : '' ) . '
             <div class="ptm_competitor_stack">
                 <h3>' . __( 'realtime stack size', 'ptm' ) . '</h3>
                 <div id="ptm_chart_stack" data-stack="' . json_encode( $stack['stack'], JSON_NUMERIC_CHECK ) . '" data-change="' .
