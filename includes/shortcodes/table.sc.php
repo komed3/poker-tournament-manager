@@ -39,6 +39,40 @@
             LIMIT		0, 1
         ' );
         
+        $seats = [];
+        $hstack = $chipleader->s_stack;
+        $i = 1;
+        
+        foreach( $wpdb->get_results( '
+            SELECT      *
+            FROM        ' . $wpdb->prefix . 'seat,
+                        ' . $wpdb->prefix . 'profile
+            WHERE       s_table = ' . $table->t_id . '
+            AND         p_id = s_profile
+            ORDER BY    s_stack DESC,
+                        s_seat ASC
+        ' ) as $seat ) {
+            
+            $seats[] = '<tr>
+                <td>' . number_format_i18n( $seat->s_seat ) . '</td>
+                <td>' . _ptm_link( 'competitor', $seat->p_name, [ 'tm' => $tm->tm_id, 'id' => $seat->p_id ] ) . '</td>
+                ' . ( $seat->s_stack == 0
+                        ? '<td colspan="4">' . _ptm_msg( 'e' ) . '</td>'
+                        : '<td>' . _ptm_stack( $seat->s_stack ) . '</td>
+                           <td>' . _ptm_stack( $seat->s_stack - $seat->s_entry, true ) . '</td>
+                           <td>' . number_format_i18n( $seat->s_stack / $stats->chips * 100, 1 ) . '&nbsp;%</td>
+                           <td>' . _ptm_ordinal( $i ) . __( ' in chips' ) . '</td>' ) . '
+            </tr>';
+            
+            if( $seat->s_stack < $hstack ) {
+                
+                $hstack = $seat->s_stack;
+                $i++;
+                
+            }
+            
+        }
+        
         return _ptm( '
             <div class="ptm_table_header ptm_header">
                 ' . _ptm_link( 'table', __( 'back', 'ptm' ), [ 'tm' => $tm->tm_id ], 'ptm_button ptm_hlink' ) . '
@@ -62,9 +96,30 @@
                     <div>
                         <h3>' . __( 'chipleader', 'ptm' ) . '</h3>
                         <span>' . _ptm_link( 'competitor', $chipleader->p_name, [ 'tm' => $tm->tm_id, 'id' => $chipleader->p_id ] ) . ' (' .
-                                  _ptm_stack( $chipleader->s_stack ) . ')</span>
+                                  _ptm_stack( $chipleader->s_stack ) . ', ' .
+                                  number_format_i18n( $chipleader->s_stack / $stats->chips * 100, 1 ) . '&nbsp;%)</span>
                     </div>
                 </div>
+            </div>
+            <div class="ptm_table_seats">
+                <h3>' . __( 'seats and stacks', 'ptm' ) . '</h3>
+                <table class="ptm_list">
+                    <thead>
+                        <tr>
+                            <th>' . __( 'seat', 'ptm' ) . '</th>
+                            <th>' . __( 'competitor', 'ptm' ) . '</th>
+                            <th>' . __( 'stack', 'ptm' ) . '</th>
+                            <th>' . __( 'change', 'ptm' ) . '</th>
+                            <th>' . __( 'pct', 'ptm' ) . '</th>
+                            <th>' . __( 'rank', 'ptm' ) . '</th>
+                        </tr>
+                    </thead>
+                    <tbody>' . implode( '', $seats ) . '</tbody>
+                </table>
+            </div>
+            <div class="ptm_table_stacks">
+                <h3>' . __( 'realtime stack sizes', 'ptm' ) . '</h3>
+                <div id="ptm_chart_stacks"></div>
             </div>
         ', 'ptm_table_grid ptm_page' );
         
