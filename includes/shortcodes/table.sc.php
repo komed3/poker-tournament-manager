@@ -2,7 +2,7 @@
     
     function ptm_sc_table() {
         
-        global $wpdb;
+        global $wpdb, $ptm_path;
         
         if( !isset( $_GET['tm'] ) )
             return ptm_sc_table_tournaments();
@@ -73,6 +73,35 @@
             
         }
         
+        $stacks = [];
+        
+        foreach( $wpdb->get_results( '
+            SELECT  p_name,
+                    st_value,
+                    st_touched
+            FROM    ' . $wpdb->prefix . 'stack,
+                    ' . $wpdb->prefix . 'profile
+            WHERE (
+                st_table = ' . $table->t_id . ' OR
+                st_table IS NULL
+            )
+            AND     p_id = st_profile
+        ' ) as $s ) {
+            
+            $stacks[ $s->p_name ][] = [
+                strtotime( $s->st_touched ) * 1000,
+                $s->st_value
+            ];
+            
+        }
+        
+        wp_enqueue_script( 'ptm.js.table', $ptm_path . 'js/table.js', [ 'jquery', 'highstock', 'ptm.js.global' ] );
+        
+        wp_add_inline_script( 'ptm.js.table', '
+            var ptm_chart_stacks_seats = ' . json_encode( array_keys( $stacks ) ) . ',
+                ptm_chart_stacks_data = ' . json_encode( array_values( $stacks ), JSON_NUMERIC_CHECK ) . ';
+        ', 'before' );
+        
         return _ptm( '
             <div class="ptm_table_header ptm_header">
                 ' . _ptm_link( 'table', __( 'back', 'ptm' ), [ 'tm' => $tm->tm_id ], 'ptm_button ptm_hlink' ) . '
@@ -103,7 +132,7 @@
             </div>
             <div class="ptm_table_seats">
                 <h3>' . __( 'seats and stacks', 'ptm' ) . '</h3>
-                <table class="ptm_list">
+                <table class="ptm_list ranking">
                     <thead>
                         <tr>
                             <th>' . __( 'seat', 'ptm' ) . '</th>
