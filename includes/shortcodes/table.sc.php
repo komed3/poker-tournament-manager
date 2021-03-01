@@ -22,10 +22,49 @@
             WHERE   t_id = ' . $_GET['id']
         );
         
+        $stats = $wpdb->get_row( '
+            SELECT  COUNT( s_seat ) AS seats,
+                    SUM( s_stack ) AS chips
+            FROM    ' . $wpdb->prefix . 'seat
+            WHERE   s_table = ' . $table->t_id
+        );
+        
+        $chipleader = $wpdb->get_row( '
+            SELECT		*
+            FROM		' . $wpdb->prefix . 'seat,
+                        ' . $wpdb->prefix . 'profile
+            WHERE	    s_table = ' . $table->t_id . '
+            AND		    p_id = s_profile
+            ORDER BY	s_stack DESC
+            LIMIT		0, 1
+        ' );
+        
         return _ptm( '
             <div class="ptm_table_header ptm_header">
                 ' . _ptm_link( 'table', __( 'back', 'ptm' ), [ 'tm' => $tm->tm_id ], 'ptm_button ptm_hlink' ) . '
+                ' . _ptm_link( 'live', __( 'live', 'ptm' ), [ 'table' => $table->t_id ], 'ptm_button ptm_hlink' ) . '
                 <h1>' . _ptm_link( 'tournament', $tm->tm_name, [ 'id' => $tm->tm_id ] ) . ': ' . $table->t_name . '</h1>
+            </div>
+            <div class="ptm_table_overview">
+                <div class="ptm_biglist">
+                    <div>
+                        <h3>' . __( 'status', 'ptm' ) . '</h3>
+                        <span>' . $table->t_status . '</span>
+                    </div>
+                    <div>
+                        <h3>' . __( 'seats', 'ptm' ) . '</h3>
+                        <span>' . number_format_i18n( $stats->seats ) . '</span>
+                    </div>
+                    <div>
+                        <h3>' . __( 'total chips', 'ptm' ) . '</h3>
+                        <span>' . _ptm_stack( $stats->chips ) . '</span>
+                    </div>
+                    <div>
+                        <h3>' . __( 'chipleader', 'ptm' ) . '</h3>
+                        <span>' . _ptm_link( 'competitor', $chipleader->p_name, [ 'tm' => $tm->tm_id, 'id' => $chipleader->p_id ] ) . ' (' .
+                                  _ptm_stack( $chipleader->s_stack ) . ')</span>
+                    </div>
+                </div>
             </div>
         ', 'ptm_table_grid ptm_page' );
         
@@ -59,12 +98,12 @@
             
             $stats = $wpdb->get_row( '
                 SELECT  COUNT( s_seat ) AS seats,
-                        SUM( s_stack ) AS stack
+                        SUM( s_stack ) AS chips
                 FROM    ' . $wpdb->prefix . 'seat
                 WHERE   s_table = ' . $table->t_id
             );
             
-            $chiplead = $wpdb->get_row( '
+            $chipleader = $wpdb->get_row( '
                 SELECT		*
                 FROM		' . $wpdb->prefix . 'seat,
                             ' . $wpdb->prefix . 'profile
@@ -79,8 +118,8 @@
                 <td>' . _ptm_date( $table->t_touched ) . '</td>
                 <td>' . $table->t_status . '</td>
                 <td>' . number_format_i18n( $stats->seats ) . '</td>
-                <td>' . _ptm_stack( $stats->stack ) . '</td>
-                <td>' . _ptm_link( 'competitor', $chiplead->p_name, [ 'tm' => $tm->tm_id, 'id' => $chiplead->p_id ] ) . '</td>
+                <td>' . _ptm_stack( $stats->chips ) . '</td>
+                <td>' . _ptm_link( 'competitor', $chipleader->p_name, [ 'tm' => $tm->tm_id, 'id' => $chipleader->p_id ] ) . '</td>
             </tr>';
             
         }
@@ -99,8 +138,8 @@
                             <th>' . __( 'date', 'ptm' ) . '</th>
                             <th>' . __( 'status', 'ptm' ) . '</th>
                             <th>' . __( 'seats', 'ptm' ) . '</th>
-                            <th>' . __( 'stack', 'ptm' ) . '</th>
-                            <th>' . __( 'chiplead', 'ptm' ) . '</th>
+                            <th>' . __( 'total chips', 'ptm' ) . '</th>
+                            <th>' . __( 'chipleader', 'ptm' ) . '</th>
                         </tr>
                     </thead>
                     <tbody>' . implode( '', $list ) . '</tbody>

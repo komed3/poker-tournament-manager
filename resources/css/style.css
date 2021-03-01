@@ -76,6 +76,7 @@ input {
 /* ptm hlink */
 
 .ptm_hlink {
+    margin-left: 0.3em;
     float: right;
     font-size: 1.2em;
 }
