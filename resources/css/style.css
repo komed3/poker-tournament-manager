@@ -47,7 +47,8 @@ input {
     color: var( --ptm-hl1 );
 }
 
-.ptm_container a:hover {
+.ptm_container a:not(.ptm_button):hover {
+    text-decoration: underline !important;
     color: var( --ptm-hl2 );
 }
 
@@ -166,6 +167,7 @@ ordinal[data-sfx]::after {
     height: 22px;
     background: var( --ptm-lgray );
     border-radius: 11px;
+    box-shadow: var( --ptm-box-shadow );
     overflow: hidden;
 }
 
@@ -176,7 +178,7 @@ ordinal[data-sfx]::after {
 }
 
 .ptm_range .bar:not(:last-child) {
-    border-right: 2px solid var( --ptm-bg );
+    border-right: 2px solid var( --ptm-lgray );
 }
 
 .ptm_range .bar span {

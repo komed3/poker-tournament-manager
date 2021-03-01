@@ -5,7 +5,7 @@
         global $wpdb, $ptm_path;
         
         if( !isset( $_GET['tm'] ) )
-            return ptm_cs_competitor_tournaments();
+            return ptm_sc_competitor_tournaments();
         
         $tm = $wpdb->get_row( '
             SELECT  *
@@ -21,7 +21,7 @@
         );
         
         if( !isset( $_GET['id'] ) )
-            return ptm_cs_competitor_list( $tm, $max );
+            return ptm_sc_competitor_list( $tm, $max );
         
         $profile = $wpdb->get_row( '
             SELECT  *
@@ -119,13 +119,13 @@
             ' . ( $hands > 0 ? '
                     <div class="ptm_competitor_range">
                         <div class="ptm_range">
-                            <div class="bar good" style="width: ' . $range['win'] . '%;" title="' . __( 'win', 'ptm' ) . '">
+                            <div class="bar good" style="width: ' . $range['win'] . '%;" title="' . __( 'won hands', 'ptm' ) . '">
                                 <span>' . number_format_i18n( $range['win'], 1 ) . '&nbsp;%</span>
                             </div>
-                            <div class="bar bad" style="width: ' . $range['loss'] . '%;" title="' . __( 'loss', 'ptm' ) . '">
+                            <div class="bar bad" style="width: ' . $range['loss'] . '%;" title="' . __( 'lost hands', 'ptm' ) . '">
                                 <span>' . number_format_i18n( $range['loss'], 1 ) . '&nbsp;%</span>
                             </div>
-                            <div class="bar" style="width: ' . $range['unplayed'] . '%;" title="' . __( 'unplayed', 'ptm' ) . '">
+                            <div class="bar" style="width: ' . $range['unplayed'] . '%;" title="' . __( 'unplayed hands', 'ptm' ) . '">
                                 <span>' . number_format_i18n( $range['unplayed'], 1 ) . '&nbsp;%</span>
                             </div>
                         </div>
@@ -139,7 +139,7 @@
         
     }
     
-    function ptm_cs_competitor_list( $tm, $max ) {
+    function ptm_sc_competitor_list( $tm, $max ) {
         
         global $wpdb;
         
@@ -179,7 +179,7 @@
                 <h1>' . ucfirst( __( 'competitors of ', 'ptm' ) ) . _ptm_link( 'tournament', $tm->tm_name, [ 'id' => $tm->tm_id ] ) . '</h1>
             </div>
             ' . $pager . '
-            <div class="ptm_profile_list">
+            <div class="ptm_competitor_list">
                 <table class="ptm_list">
                     <thead>
                         <tr>
@@ -199,7 +199,7 @@
         
     }
     
-    function ptm_cs_competitor_tournaments() {
+    function ptm_sc_competitor_tournaments() {
         
         global $wpdb;
         
