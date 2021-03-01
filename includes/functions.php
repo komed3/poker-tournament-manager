@@ -117,10 +117,10 @@
         int $number
     ) {
         
-        return $number == 0 ? '0' : '<ordinal data-sfx="' . [
+        return $number == 0 ? '0' : '<ordinal data-sfx="' . ( $number > 9 && $number < 20 ? 'th' : [
             0 => 'th', 1 => 'st', 2 => 'nd', 3 => 'rd', 4 => 'th',
             5 => 'th', 6 => 'th', 7 => 'th', 8 => 'th', 9 => 'th'
-        ][ $number % 10 ] . '">' . $number . '</ordinal>';
+        ][ $number % 10 ] ) . '">' . $number . '</ordinal>';
         
     }
     

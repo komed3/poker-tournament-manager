@@ -27,6 +27,12 @@
             AND     cp_stack > 0
         ' )->cnt;
         
+        $levels = $wpdb->get_row( '
+            SELECT  COUNT( l_level ) AS cnt
+            FROM    ' . $wpdb->prefix . 'level
+            WHERE   l_tournament = ' . $tm->tm_id
+        )->cnt;
+        
         $total_buyin = $competitors->cnt * $tm->tm_buyin + ( $competitors->buyins - $competitors->cnt ) * $tm->tm_rebuy;
         $total_payout = $total_buyin * $tm->tm_payout_pct;
         
@@ -47,7 +53,11 @@
                     </div>
                     <div>
                         <h3>' . __( 'field', 'ptm' ) . '</h3>
-                        <span>' . $cleft . __( ' of ', 'ptm' ) . number_format_i18n( $competitors->cnt ) . '</span>
+                        <span>' . number_format_i18n( $cleft ) . __( ' of ', 'ptm' ) . number_format_i18n( $competitors->cnt ) . '</span>
+                    </div>
+                    <div>
+                        <h3>' . __( 'level', 'ptm' ) . '</h3>
+                        <span>' . number_format_i18n( $tm->tm_level ) . __( ' of ', 'ptm' ) . number_format_i18n( $levels ) . '</span>
                     </div>
                     <div>
                         <h3>' . __( 'buy-in', 'ptm' ) . '</h3>

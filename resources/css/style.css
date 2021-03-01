@@ -27,6 +27,10 @@ body {
     background-attachment: fixed;
 }
 
+input {
+    margin: 0 !important;
+}
+
 .ptm_container {
     margin: 3.2em auto 2.2em auto;
 }
@@ -78,7 +82,7 @@ body {
 /* ptm rank */
 
 rank {
-    font-weight: bold;
+    font-weight: 600;
 }
 rank::before {
     content: '#';
@@ -106,11 +110,19 @@ cash.bad b::before {
     color: var( --ptm-bad );
 }
 
+cash b {
+    font-weight: 600;
+}
+
 /* ptm ordinal */
+
+ordinal {
+    font-weight: 600;
+}
 
 ordinal[data-sfx]::after {
     content: attr( data-sfx );
-    font-size: 0.7em;
+    font-size: 0.75em;
 }
 
 /* ptm header */
@@ -135,6 +147,10 @@ ordinal[data-sfx]::after {
 .ptm_button:hover {
     color: var( --ptm-bg ) !important;
     background: var( --ptm-hl2 );
+}
+
+.ptm_button.alert:hover {
+    background: var( --ptm-bad );
 }
 
 .ptm_button.disabled {
