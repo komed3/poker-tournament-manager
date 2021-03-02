@@ -259,6 +259,28 @@ ordinal[data-sfx]::after {
     font-size: 1.3em;
 }
 
+/* ptm form */
+
+.ptm_container .form-line {
+    margin-bottom: 1.2em;
+}
+
+.ptm_container .form-line label {
+    display: block;
+    margin-bottom: 0.4em;
+    text-transform: uppercase;
+    font-size: 0.8em;
+    font-weight: 600;
+}
+
+.ptm_container .form-line input {
+    display: block;
+    width: 50%;
+    padding: 0.4em 0.6em;
+    line-height: 1;
+    font-size: 1.1em;
+}
+
 /* charts */
 
 #ptm_chart_cash {

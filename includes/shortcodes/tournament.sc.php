@@ -5,7 +5,10 @@
         global $wpdb;
         
         if( !isset( $_GET['id'] ) )
-            return ptm_cs_tournament_list();
+            return ptm_sc_tournament_list();
+        
+        if( strtolower( $_GET['id'] ) == 'new' )
+            return ptm_sc_tournament_new();
         
         $tm = $wpdb->get_row( '
             SELECT  *
@@ -90,13 +93,13 @@
                     <li>' . _ptm_link( 'payout', __( 'Payout spread', 'ptm' ), [ 'tm' => $tm->tm_id ] ) . '</li>
                 </ul>
             </div>
-            ' . ptm_cs_tournament_payout( $tm ) . '
-            ' . ptm_cs_tournament_chiplead( $tm ) . '
+            ' . ptm_sc_tournament_payout( $tm ) . '
+            ' . ptm_sc_tournament_chiplead( $tm ) . '
         ', 'ptm_tournament_grid ptm_page' );
         
     }
     
-    function ptm_cs_tournament_payout( $tm ) {
+    function ptm_sc_tournament_payout( $tm ) {
         
         global $wpdb;
         
@@ -146,7 +149,7 @@
         
     }
     
-    function ptm_cs_tournament_chiplead( $tm ) {
+    function ptm_sc_tournament_chiplead( $tm ) {
         
         global $wpdb;
         
@@ -202,7 +205,7 @@
         
     }
     
-    function ptm_cs_tournament_list() {
+    function ptm_sc_tournament_list() {
         
         global $wpdb;
         
@@ -267,6 +270,80 @@
             </div>
             ' . $pager . '
         ', 'ptm_tournament_list_grid ptm_page' );
+        
+    }
+    
+    function ptm_sc_tournament_new() {
+        
+        global $wpdb, $ptm_pages;
+        
+        if( isset( $_POST['tm_new'] ) ) {
+            
+            if( $wpdb->insert(
+                $wpdb->prefix . 'tournament',
+                [
+                    'tm_name' => $_POST['tm_name'],
+                    'tm_date' => $_POST['tm_date'],
+                    'tm_status' => 'open',
+                    'tm_buyin' => $_POST['tm_buyin'],
+                    'tm_rebuy' => $_POST['tm_rebuy'],
+                    'tm_stack' => $_POST['tm_stack'],
+                    'tm_restack' => $_POST['tm_restack'],
+                    'tm_leveltime' => $_POST['tm_leveltime'],
+                    'tm_payout_pct' => $_POST['tm_payout_pct']
+                ]
+            ) ) return _ptm( '
+                <p>' . __( 'New tournament was added successfully: ', 'ptm' ) . '<b>' . $_POST['tm_name'] . '</b></p>
+                <a href="' . get_page_link( $ptm_pages['tournament'] ) . '?id=' . $wpdb->insert_id . '">' .
+                                  __( '&rarr; go to tournament page', 'ptm' ) .
+                             '</a>', 'ptm_page' );
+            
+        }
+        
+        return _ptm( '
+            <div class="ptm_tournament_new_header ptm_header">
+                ' . _ptm_link( 'tournament', __( 'back', 'ptm' ), [], 'ptm_button ptm_hlink' ) . '
+                <h1>' . ucfirst( __( 'create tournament', 'ptm' ) ) . '</h1>
+            </div>
+            <p>' . __( 'Use the following form to create a new tournament and define important general properties such as buy-in, stack size, etc.', 'ptm' ) . '</p>
+            <form action="' . $_SERVER['REQUEST_URI'] . '" method="post">
+                <div class="form-line">
+                    <label for="tm_name">' . __( 'tournament name', 'ptm' ) . '</label>
+                    <input type="text" id="tm_name" name="tm_name" required />
+                </div>
+                <div class="form-line">
+                    <label for="tm_date">' . __( 'start date', 'ptm' ) . '</label>
+                    <input type="date" id="tm_date" name="tm_date" value="' . date( 'Y-m-d' ) . '" min="' . date( 'Y-m-d' ) . '" required />
+                </div>
+                <div class="form-line">
+                    <label for="tm_buyin">' . __( 'tournament buy-in', 'ptm' ) . ' (' . _ptm_opt( 'currency', 'USD' ) . ')</label>
+                    <input type="number" id="tm_buyin" name="tm_buyin" value="0" min="0" required />
+                </div>
+                <div class="form-line">
+                    <label for="tm_rebuy">' . __( 'tournament rebuy', 'ptm' ) . ' (' . _ptm_opt( 'currency', 'USD' ) . ')</label>
+                    <input type="number" id="tm_rebuy" name="tm_rebuy" value="0" min="0" required />
+                </div>
+                <div class="form-line">
+                    <label for="tm_stack">' . __( 'entry stack (Chips)', 'ptm' ) . '</label>
+                    <input type="number" id="tm_stack" name="tm_stack" value="1000" min="0" />
+                </div>
+                <div class="form-line">
+                    <label for="tm_restack">' . __( 're-entry stack (Chips)', 'ptm' ) . '</label>
+                    <input type="number" id="tm_restack" name="tm_restack" value="1000" min="0" />
+                </div>
+                <div class="form-line">
+                    <label for="tm_leveltime">' . __( 'time per level (min)', 'ptm' ) . '</label>
+                    <input type="number" id="tm_leveltime" name="tm_leveltime" value="45" min="20" step="1" />
+                </div>
+                <div class="form-line">
+                    <label for="tm_payout_pct">' . __( 'price pool size (percent of total buy-in cash)', 'ptm' ) . '</label>
+                    <input type="number" id="tm_payout_pct" name="tm_payout_pct" value="0.95" min="0" max="1" step="0.05" />
+                </div>
+                <div class="form-line">
+                    <button type="submit" name="tm_new" value="1">' . __( 'create tournament', 'ptm' ) . '</button>
+                </div>
+            </form>
+        ', 'ptm_tournament_new_grid ptm_page' );
         
     }
     

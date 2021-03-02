@@ -129,7 +129,10 @@
         $format = null
     ) {
         
-        return date_i18n( !is_string( $format ) ? get_option( 'date_format' ) : $format, $timestring );
+        return date_i18n(
+            !is_string( $format ) ? get_option( 'date_format' ) : $format,
+            is_int( $timestring ) ? $timestring : strtotime( $timestring )
+        );
         
     }
     
