@@ -124,6 +124,26 @@
         
     }
     
+    function _ptm_card(
+        $card = null
+    ) {
+        
+        return strlen( $card ) != 2 ? '' : '<card class="' . [
+            'c' => 'clubs', 'd' => 'diamonds', 'h' => 'hearts', 's' => 'spades'
+        ][ strtolower( substr( $card, 0, 1 ) ) ] . '" title="' . __( [
+            '2' => '2', '3' => '3', '4' => '4', '5' => '5', '6' => '6',
+            '7' => '7', '8' => '8', '9' => '9', '1' => '10', 'j' => 'Jack',
+            'q' => 'Queen', 'k' => 'King', 'a' => 'Ace'
+        ][ strtolower( substr( $card, 1, 1 ) ) ], 'ptm' ) . __( ' of ', 'ptm' ) . __( [
+            'c' => 'Clubs', 'd' => 'Diamonds', 'h' => 'Hearts', 's' => 'Spades'
+        ][ strtolower( substr( $card, 0, 1 ) ) ], 'ptm' ) . '">' . [
+            '2' => '2', '3' => '3', '4' => '4', '5' => '5', '6' => '6',
+            '7' => '7', '8' => '8', '9' => '9', '1' => '10', 'j' => 'J',
+            'q' => 'Q', 'k' => 'K', 'a' => 'A'
+        ][ strtolower( substr( $card, 1, 1 ) ) ] . '</card>';
+        
+    }
+    
     function _ptm_date(
         string $timestring,
         $format = null

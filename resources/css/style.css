@@ -17,6 +17,9 @@
     
     --ptm-good: #448800;
     --ptm-bad: #bb3300;
+    
+    --ptm-black: #000000;
+    --ptm-red: #ff0000;
 }
 
 body {
@@ -125,6 +128,42 @@ ordinal {
 ordinal[data-sfx]::after {
     content: attr( data-sfx );
     font-size: 0.75em;
+}
+
+/* ptm card */
+
+card {
+    padding-right: 0.4em;
+}
+
+card::before {
+    padding-right: 0.1em;
+}
+
+card.clubs,
+card.spades {
+    color: var( --ptm-black );
+}
+
+card.diamonds,
+card.hearts {
+    color: var( --ptm-red );
+}
+
+card.clubs::before {
+    content: '♣';
+}
+
+card.diamonds::before {
+    content: '♦';
+}
+
+card.hearts::before {
+    content: '♥';
+}
+
+card.spades::before {
+    content: '♠';
 }
 
 /* ptm header */

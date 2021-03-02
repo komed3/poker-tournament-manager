@@ -95,6 +95,32 @@
             
         }
         
+        $hands = [];
+        
+        foreach( $wpdb->get_results( '
+            SELECT      *
+            FROM        ' . $wpdb->prefix . 'hand,
+                        ' . $wpdb->prefix . 'level
+            WHERE       h_table = ' . $table->t_id . '
+            AND         l_level = h_level
+            AND         l_tournament = ' . $tm->tm_id . '
+            ORDER BY    h_hand DESC
+            LIMIT       0, 250
+        ' ) as $hand ) {
+            
+            $hands[] = '<tr>
+                <td>' . number_format_i18n( $hand->h_hand ) . '</td>
+                <td>' . $hand->l_sb . '/' . $hand->l_bb . '/' . $hand->l_ante . '</td>
+                <td>' . _ptm_card( $hand->h_flop_1 ) . _ptm_card( $hand->h_flop_2 ) . _ptm_card( $hand->h_flop_3 ) . '</td>
+                <td>' . _ptm_card( $hand->h_turn ) . '</td>
+                <td>' . _ptm_card( $hand->h_river ) . '</td>
+                <td>' . _ptm_stack( $hand->h_pot ) . '</td>
+                <td>' . __( $hand->h_termination, 'ptm' ) . '</td>
+                <td>' . _ptm_date( $hand->h_touched, 'H:i' ) . '</td>
+            </tr>';
+            
+        }
+        
         wp_enqueue_script( 'ptm.js.table', $ptm_path . 'js/table.js', [ 'jquery', 'highstock', 'ptm.js.global' ] );
         
         wp_add_inline_script( 'ptm.js.table', '
@@ -112,7 +138,7 @@
                 <div class="ptm_biglist">
                     <div>
                         <h3>' . __( 'status', 'ptm' ) . '</h3>
-                        <span>' . $table->t_status . '</span>
+                        <span>' . __( $table->t_status, 'ptm' ) . '</span>
                     </div>
                     <div>
                         <h3>' . __( 'seats', 'ptm' ) . '</h3>
@@ -149,6 +175,24 @@
             <div class="ptm_table_stacks">
                 <h3>' . __( 'realtime stack sizes', 'ptm' ) . '</h3>
                 <div id="ptm_chart_stacks"></div>
+            </div>
+            <div class="ptm_table_hands">
+                <h3>' . __( 'played hands', 'ptm' ) . '</h3>
+                <table class="ptm_list">
+                    <thead>
+                        <tr>
+                            <th>' . __( 'hand', 'ptm' ) . '</th>
+                            <th>' . __( 'blinds', 'ptm' ) . '</th>
+                            <th>' . __( 'flop', 'ptm' ) . '</th>
+                            <th>' . __( 'turn', 'ptm' ) . '</th>
+                            <th>' . __( 'river', 'ptm' ) . '</th>
+                            <th>' . __( 'pot', 'ptm' ) . '</th>
+                            <th>' . __( 'termination', 'ptm' ) . '</th>
+                            <th>' . __( 'time', 'ptm' ) . '</th>
+                        </tr>
+                    </thead>
+                    <tbody>' . implode( '', $hands ) . '</tbody>
+                </table>
             </div>
         ', 'ptm_table_grid ptm_page' );
         
