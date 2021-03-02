@@ -16,6 +16,9 @@
         if( !isset( $_GET['id'] ) )
             return ptm_sc_table_list( $tm );
         
+        if( strtolower( $_GET['id'] ) == 'new' )
+            return ptm_sc_table_new( $tm );
+        
         $table = $wpdb->get_row( '
             SELECT  *
             FROM    ' . $wpdb->prefix . 'table
@@ -150,9 +153,10 @@
                     </div>
                     <div>
                         <h3>' . __( 'chipleader', 'ptm' ) . '</h3>
-                        <span>' . _ptm_link( 'competitor', $chipleader->p_name, [ 'tm' => $tm->tm_id, 'id' => $chipleader->p_id ] ) . ' (' .
-                                  _ptm_stack( $chipleader->s_stack ) . ', ' .
-                                  number_format_i18n( $chipleader->s_stack / $stats->chips * 100, 1 ) . '&nbsp;%)</span>
+                        <span>' . ( $chipleader == null ? '–' :
+                                        _ptm_link( 'competitor', $chipleader->p_name, [ 'tm' => $tm->tm_id, 'id' => $chipleader->p_id ] ) . ' (' .
+                                        _ptm_stack( $chipleader->s_stack ) . ', ' .
+                                        number_format_i18n( $chipleader->s_stack / $stats->chips * 100, 1 ) . '&nbsp;%)' ) . '</span>
                     </div>
                 </div>
             </div>
@@ -247,7 +251,7 @@
                 <td>' . $table->t_status . '</td>
                 <td>' . number_format_i18n( $stats->seats ) . '</td>
                 <td>' . _ptm_stack( $stats->chips ) . '</td>
-                <td>' . _ptm_link( 'competitor', $chipleader->p_name, [ 'tm' => $tm->tm_id, 'id' => $chipleader->p_id ] ) . '</td>
+                <td>' . ( $chipleader == null ? '–' : _ptm_link( 'competitor', $chipleader->p_name, [ 'tm' => $tm->tm_id, 'id' => $chipleader->p_id ] ) ) . '</td>
             </tr>';
             
         }
@@ -335,6 +339,109 @@
             </div>
             ' . $pager . '
         ', 'ptm_table_list_grid ptm_page' );
+        
+    }
+    
+    function ptm_sc_table_new( $tm ) {
+        
+        global $wpdb;
+        
+        if( isset( $_POST['t_new'] ) ) {
+            
+            if( $wpdb->insert(
+                $wpdb->prefix . 'table',
+                [
+                    't_tournament' => $tm->tm_id,
+                    't_name' => $_POST['t_name'],
+                    't_status' => 'open'
+                ]
+            ) ) {
+                
+                $table = $wpdb->insert_id;
+                
+                for( $i = 1; $i <= 12; $i++ ) {
+                    
+                    if( !isset( $_POST['seat_' . $i ] ) || empty( $_POST['seat_' . $i ] ) )
+                        continue;
+                    
+                    $c = $wpdb->get_row( '
+                        SELECT  p_id, cp_stack
+                        FROM    ' . $wpdb->prefix . 'profile,
+                                ' . $wpdb->prefix . 'competitor
+                        WHERE   p_id = ' . $_POST['seat_' . $i ] . '
+                        AND     cp_profile = p_id
+                    ' );
+                    
+                    $wpdb->insert(
+                        $wpdb->prefix . 'seat',
+                        [
+                            's_table' => $table,
+                            's_seat' => $i,
+                            's_profile' => $c->p_id,
+                            's_stack' => $c->cp_stack,
+                            's_entry' => $c->cp_stack
+                        ]
+                    );
+                    
+                }
+                
+                return _ptm( '
+                    <p>' . __( 'New tournament table was added successfully: ', 'ptm' ) . '<b>' . $_POST['t_name'] . '</b></p>
+                    <p>' . _ptm_link( 'table', __( '&rarr; go to table', 'ptm' ), [ 'tm' => $tm->tm_id, 'id' => $table ] ) . '</p>
+                ', 'ptm_page' );
+                
+            }
+            
+        }
+        
+        $competitors = [];
+        
+        foreach( $wpdb->get_results( '
+            SELECT  p_id, p_name, cp_stack
+            FROM    ' . $wpdb->prefix . 'competitor,
+                    ' . $wpdb->prefix . 'profile
+            WHERE   cp_tournament = ' . $tm->tm_id . '
+            AND     p_id = cp_profile
+        ' ) as $c ) {
+            
+            $competitors[] = '<option value="' . $c->p_id . '">
+                ' . $c->p_name . ' (' . _ptm_stack( $c->cp_stack ) . ')
+            </option>';
+            
+        }
+        
+        $seats = [];
+        
+        for( $i = 1; $i <= 12; $i++ ) {
+            
+            $seats[] = '<div class="form-line">
+                <label for="seat_' . $i . '">' . __( 'seat ', 'ptm' ) . $i . '</label>
+                <select id="seat_' . $i . '" name="seat_' . $i . '">
+                    <option value="">' . __( 'unused', 'ptm' ) . '</option>
+                    ' . implode( '', $competitors ) . '
+                </select>
+            </div>';
+            
+        }
+        
+        return _ptm( '
+            <div class="ptm_table_new_header ptm_header">
+                ' . _ptm_link( 'table', __( 'back', 'ptm' ), [], 'ptm_button ptm_hlink' ) . '
+                <h1>' . ucfirst( __( 'create table for ', 'ptm' ) ) .
+                        _ptm_link( 'tournament', $tm->tm_name, [ 'id' => $tm->tm_id ] ) . '</h1>
+            </div>
+            <p>' . __( 'Use the following form to create a new tournament table.', 'ptm' ) . '</p>
+            <form action="' . $_SERVER['REQUEST_URI'] . '" method="post">
+                <div class="form-line">
+                    <label for="t_name">' . __( 'table name', 'ptm' ) . '</label>
+                    <input type="text" id="t_name" name="t_name" required />
+                </div>
+                ' . implode( '', $seats ) . '
+                <div class="form-line">
+                    <button type="submit" name="t_new" value="1">' . __( 'create table', 'ptm' ) . '</button>
+                </div>
+            </form>
+        ', 'ptm_table_new_grid ptm_page' );
         
     }
     

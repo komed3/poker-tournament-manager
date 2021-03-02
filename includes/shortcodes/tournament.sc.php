@@ -275,7 +275,7 @@
     
     function ptm_sc_tournament_new() {
         
-        global $wpdb, $ptm_pages;
+        global $wpdb;
         
         if( isset( $_POST['tm_new'] ) ) {
             
@@ -294,9 +294,8 @@
                 ]
             ) ) return _ptm( '
                 <p>' . __( 'New tournament was added successfully: ', 'ptm' ) . '<b>' . $_POST['tm_name'] . '</b></p>
-                <a href="' . get_page_link( $ptm_pages['tournament'] ) . '?id=' . $wpdb->insert_id . '">' .
-                                  __( '&rarr; go to tournament page', 'ptm' ) .
-                             '</a>', 'ptm_page' );
+                <p>' . _ptm_link( 'tournament', __( '&rarr; go to tournament page', 'ptm' ), [ 'id' => $wpdb->insert_id ] ) . '</p>
+            ', 'ptm_page' );
             
         }
         

@@ -30,7 +30,8 @@ body {
     background-attachment: fixed;
 }
 
-input {
+input,
+select {
     margin: 0 !important;
 }
 
@@ -312,7 +313,8 @@ card.spades::before {
     font-weight: 600;
 }
 
-.ptm_container .form-line input {
+.ptm_container .form-line input,
+.ptm_container .form-line select {
     display: block;
     width: 50%;
     padding: 0.4em 0.6em;

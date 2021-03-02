@@ -76,7 +76,7 @@
     }
     
     function _ptm_change(
-        float $number = 0
+        $number = 0
     ) {
         
         return ( $number > 0 ? 'good' : ( $number < 0 ? 'bad' : '' ) );
@@ -84,10 +84,13 @@
     }
     
     function _ptm_cash(
-        float $cash = 0,
+        $cash = 0,
         int $digits = 0,
         bool $change = false
     ) {
+        
+        if( !is_numeric( $cash ) )
+            return '';
         
         $pow10 = floor( (int) ( log10( abs( $cash ) ) ) / 3 );
         
@@ -100,9 +103,12 @@
     }
     
     function _ptm_stack(
-        float $stack = 0,
+        $stack = 0,
         bool $change = false
     ) {
+        
+        if( !is_numeric( $stack ) )
+            return '';
         
         $pow10 = floor( (int) ( log10( abs( $stack ) ) ) / 3 );
         
@@ -114,10 +120,10 @@
     }
     
     function _ptm_ordinal(
-        int $number
+        $number = 0
     ) {
         
-        return $number == 0 ? '0' : '<ordinal data-sfx="' . ( $number > 9 && $number < 20 ? 'th' : [
+        return !is_numeric( $number ) || $number == 0 ? '0' : '<ordinal data-sfx="' . ( $number > 9 && $number < 20 ? 'th' : [
             0 => 'th', 1 => 'st', 2 => 'nd', 3 => 'rd', 4 => 'th',
             5 => 'th', 6 => 'th', 7 => 'th', 8 => 'th', 9 => 'th'
         ][ $number % 10 ] ) . '">' . $number . '</ordinal>';
