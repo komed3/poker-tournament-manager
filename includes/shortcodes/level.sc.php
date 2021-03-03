@@ -13,8 +13,31 @@
             WHERE   tm_id = ' . $_GET['tm']
         );
         
+        if( isset( $_POST['add_level'] ) ) {
+            
+            if( $wpdb->insert(
+                $wpdb->prefix . 'level',
+                [
+                    'l_tournament' => $tm->tm_id,
+                    'l_level' => $_POST['level'],
+                    'l_sb' => $_POST['sb'],
+                    'l_bb' => $_POST['bb'],
+                    'l_ante' => $_POST['ante']
+                ]
+            ) ) return _ptm( '
+                <p>' . __( 'New tournament level was added successfully.', 'ptm' ) . '</p>
+                <p>' . _ptm_link( 'level', __( 'refresh page', 'ptm' ), [ 'tm' => $tm->tm_id ] ) . '</p>
+            ', 'ptm_page' );
+            
+        }
+        
         $levels = [];
-        $nlevel = 1;
+        $last = [
+            'level' => 1,
+            'sb' => 1,
+            'bb' => 1,
+            'ante' => 0
+        ];
         
         foreach( $wpdb->get_results( '
             SELECT      *
@@ -24,15 +47,22 @@
         ' ) as $level ) {
             
             $levels[] = '<tr>
-                <td><input type="number" name="level" value="' . $level->l_level . '" /></td>
-                <td><input type="number" name="sb" value="' . $level->l_sb . '" /></td>
-                <td><input type="number" name="bb" value="' . $level->l_bb . '" /></td>
-                <td><input type="number" name="ante" value="' . $level->l_ante . '" /></td>
+                <td>' . _ptm_ordinal( $level->l_level ) . '</td>
+                <td>' . _ptm_stack( $level->l_sb ) . '</td>
+                <td>' . _ptm_stack( $level->l_bb ) . '</td>
+                <td>' . _ptm_stack( $level->l_ante ) . '</td>
             </tr>';
             
-            $nlevel++;
+            $last = [
+                'l' => $level->l_level + 1,
+                'b' => $level->l_sb,
+                'c' => $level->l_sb - $last['b']
+            ];
             
         }
+        
+        $newSB = $last['b'] + $last['c'];
+        $newBB = $newSB * 2;
         
         return _ptm( '
             <div class="ptm_level_header ptm_header">
@@ -50,24 +80,17 @@
                                 <th>' . __( 'Ante', 'ptm' ) . '</th>
                             </tr>
                         </thead>
-                        <tbody>' . implode( '', $levels ) . '</tbody>
-                    </table>
-                    <button type="submit" name="update" value="1">' . __( 'update blind structure', 'ptm' ) . '</button>
-                </form>
-            </div>
-            <div class="ptm_level_new">
-                <form action="' . $_SERVER['REQUEST_URI'] . '" method="post">
-                    <table class="ptm_list">
                         <tbody>
+                            ' . implode( '', $levels ) . '
                             <tr>
-                                <td><input type="number" name="level" value="' . $nlevel . '" readonly /></td>
-                                <td><input type="number" name="sb" value="" /></td>
-                                <td><input type="number" name="bb" value="" /></td>
-                                <td><input type="number" name="ante" value="" /></td>
+                                <td><input type="number" name="level" value="' . $last['l'] . '" readonly /></td>
+                                <td><input type="number" name="sb" value="' . $newSB . '" min="0" /></td>
+                                <td><input type="number" name="bb" value="' . $newBB . '" min="0" /></td>
+                                <td><input type="number" name="ante" value="' . $newBB . '" min="0" /></td>
                             </tr>
                         </tbody>
                     </table>
-                    <button type="submit" name="add" value="1">' . __( 'add new level with blind structure', 'ptm' ) . '</button>
+                    <button type="submit" name="add_level" value="1">' . __( 'add new level with blind structure', 'ptm' ) . '</button>
                 </form>
             </div>
         ', 'ptm_level_grid ptm_page' );
