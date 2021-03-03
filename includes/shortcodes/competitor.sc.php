@@ -23,6 +23,9 @@
         if( !isset( $_GET['id'] ) )
             return ptm_sc_competitor_list( $tm, $max );
         
+        if( strtolower( $_GET['id'] ) == 'new' )
+            return ptm_sc_competitor_new( $tm );
+        
         $profile = $wpdb->get_row( '
             SELECT  *
             FROM    ' . $wpdb->prefix . 'competitor,
@@ -270,6 +273,86 @@
             </div>
             ' . $pager . '
         ', 'ptm_competitor_list_grid ptm_page' );
+        
+    }
+    
+    function ptm_sc_competitor_new( $tm ) {
+        
+        global $wpdb;
+        
+        if( isset( $_POST['cp_new'] ) ) {
+            
+            if( $wpdb->insert(
+                $wpdb->prefix . 'competitor',
+                [
+                    'cp_tournament' => $tm->tm_id,
+                    'cp_profile' => $_POST['cp_profile'],
+                    'cp_stack' => $_POST['cp_stack']
+                ]
+            ) ) {
+                
+                $wpdb->insert(
+                    $wpdb->prefix . 'stack',
+                    [
+                        'st_profile' => $_POST['cp_profile'],
+                        'st_tournament' => $tm->tm_id,
+                        'st_flag' => 'buyin',
+                        'st_value' => $_POST['cp_stack']
+                    ]
+                );
+                
+                return _ptm( '
+                    <p>' . __( 'New tournament competitor was added successfully.', 'ptm' ) . '</p>
+                    <p>
+                        ' . _ptm_link( 'competitor', __( '&rarr; go to competitor page', 'ptm' ), [ 'tm' => $tm->tm_id, 'id' => $_POST['cp_profile'] ] ) .
+                            __( ' or ' ) .
+                            _ptm_link( 'competitor', __( 'add another' ), [ 'tm' => $tm->tm_id, 'id' => 'new' ] ) . '
+                    </p>
+                ', 'ptm_page' );
+                
+            }
+            
+        }
+        
+        $competitors = [];
+        
+        foreach( $wpdb->get_results( '
+            SELECT  *
+            FROM    ' . $wpdb->prefix . 'profile
+            WHERE NOT EXISTS (
+                SELECT  *
+                FROM    ' . $wpdb->prefix . 'competitor
+                WHERE   p_id = cp_profile
+                AND     cp_tournament = ' . $tm->tm_id . '
+            )
+        ' ) as $c ) {
+            
+            $competitors[] = '<option value="' . $c->p_id . '">' . $c->p_name . '</option>';
+            
+        }
+        
+        return _ptm( '
+            <div class="ptm_tournament_new_header ptm_header">
+                ' . _ptm_link( 'competitor', __( 'back', 'ptm' ), [ 'tm' => $tm->tm_id ], 'ptm_button ptm_hlink' ) . '
+                <h1>' . ucfirst( __( 'add competitor for ', 'ptm' ) ) . _ptm_link( 'tournament', $tm->tm_name, [ 'id' => $tm->tm_id ] ) . '</h1>
+            </div>
+            <p>' . __( 'Use the following form to add a new tournament competitor.', 'ptm' ) . '</p>
+            <form action="' . $_SERVER['REQUEST_URI'] . '" method="post">
+                <div class="form-line">
+                    <label for="cp_profile">' . __( 'competitor', 'ptm' ) . '</label>
+                    <select id="cp_profile" name="cp_profile">
+                        ' . implode( '', $competitors ) . '
+                    </select>
+                </div>
+                <div class="form-line">
+                    <label for="cp_stack">' . __( 'entry stack (Chips)', 'ptm' ) . '</label>
+                    <input type="number" id="cp_stack" name="cp_stack" value="' . $tm->tm_stack . '" min="0" required />
+                </div>
+                <div class="form-line">
+                    <button type="submit" name="cp_new" value="1">' . __( 'add competitor', 'ptm' ) . '</button>
+                </div>
+            </form>
+        ', 'ptm_tournament_new_grid ptm_page' );
         
     }
     

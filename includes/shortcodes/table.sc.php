@@ -84,10 +84,8 @@
                     st_touched
             FROM    ' . $wpdb->prefix . 'stack,
                     ' . $wpdb->prefix . 'profile
-            WHERE (
-                st_table = ' . $table->t_id . ' OR
-                st_table IS NULL
-            )
+            WHERE   st_tournament = ' . $tm->tm_id . '
+            AND     st_table = ' . $table->t_id . '
             AND     p_id = st_profile
         ' ) as $s ) {
             
@@ -359,10 +357,15 @@
                 
                 $table = $wpdb->insert_id;
                 
+                $seats = [];
+                $s = 0;
+                
                 for( $i = 1; $i <= 12; $i++ ) {
                     
-                    if( !isset( $_POST['seat_' . $i ] ) || empty( $_POST['seat_' . $i ] ) )
-                        continue;
+                    if( !isset( $_POST['seat_' . $i ] ) || empty( $_POST['seat_' . $i ] ) ||
+                        in_array( $_POST['seat_' . $i ], $seats ) ) continue;
+                    
+                    $seats[] = $_POST['seat_' . $i ];
                     
                     $c = $wpdb->get_row( '
                         SELECT  p_id, cp_stack
@@ -370,13 +373,14 @@
                                 ' . $wpdb->prefix . 'competitor
                         WHERE   p_id = ' . $_POST['seat_' . $i ] . '
                         AND     cp_profile = p_id
-                    ' );
+                        AND     cp_tournament = ' . $tm->tm_id
+                    );
                     
                     $wpdb->insert(
                         $wpdb->prefix . 'seat',
                         [
                             's_table' => $table,
-                            's_seat' => $i,
+                            's_seat' => ++$s,
                             's_profile' => $c->p_id,
                             's_stack' => $c->cp_stack,
                             's_entry' => $c->cp_stack

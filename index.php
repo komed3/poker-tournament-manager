@@ -8,6 +8,7 @@
      * Author: komed3 (Paul Köhler)
      * Author URI: https://labs.komed3.de
      * Version: 1.0.0
+     * Text Domain: ptm
      * 
      */
     
