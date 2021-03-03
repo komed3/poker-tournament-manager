@@ -291,6 +291,13 @@
                 ]
             ) ) {
                 
+                $wpdb->query( '
+                    UPDATE  ' . $wpdb->prefix . 'profile
+                    SET     p_tournaments = p_tournaments + 1,
+                            p_buyin = p_buyin + ' . $_POST['cp_buyin'] . '
+                    WHERE   p_id = ' . $_POST['cp_profile']
+                );
+                
                 $wpdb->insert(
                     $wpdb->prefix . 'stack',
                     [
@@ -332,7 +339,7 @@
         }
         
         return _ptm( '
-            <div class="ptm_tournament_new_header ptm_header">
+            <div class="ptm_competitor_new_header ptm_header">
                 ' . _ptm_link( 'competitor', __( 'back', 'ptm' ), [ 'tm' => $tm->tm_id ], 'ptm_button ptm_hlink' ) . '
                 <h1>' . ucfirst( __( 'add competitor for ', 'ptm' ) ) . _ptm_link( 'tournament', $tm->tm_name, [ 'id' => $tm->tm_id ] ) . '</h1>
             </div>
@@ -345,6 +352,10 @@
                     </select>
                 </div>
                 <div class="form-line">
+                    <label for="cp_buyin">' . __( 'tournament buy-in', 'ptm' ) . ' (' . _ptm_opt( 'currency', 'USD' ) . ')</label>
+                    <input type="number" id="cp_buyin" name="cp_buyin" value="' . $tm->tm_buyin . '" min="0" required />
+                </div>
+                <div class="form-line">
                     <label for="cp_stack">' . __( 'entry stack (Chips)', 'ptm' ) . '</label>
                     <input type="number" id="cp_stack" name="cp_stack" value="' . $tm->tm_stack . '" min="0" required />
                 </div>
@@ -352,7 +363,7 @@
                     <button type="submit" name="cp_new" value="1">' . __( 'add competitor', 'ptm' ) . '</button>
                 </div>
             </form>
-        ', 'ptm_tournament_new_grid ptm_page' );
+        ', 'ptm_competitor_new_grid ptm_page' );
         
     }
     

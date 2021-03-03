@@ -5,7 +5,10 @@
         global $wpdb, $ptm_path;
         
         if( !isset( $_GET['id'] ) )
-            return ptm_cs_profile_list();
+            return ptm_sc_profile_list();
+        
+        if( strtolower( $_GET['id'] ) == 'new' )
+            return ptm_sc_profile_new();
         
         $profile = $wpdb->get_row( '
             SELECT  *, ( p_payout - p_buyin ) AS balance
@@ -104,7 +107,7 @@
         
     }
     
-    function ptm_cs_profile_list() {
+    function ptm_sc_profile_list() {
         
         global $wpdb;
         
@@ -158,6 +161,43 @@
             </div>
             ' . $pager . '
         ', 'ptm_profile_list_grid ptm_page' );
+        
+    }
+    
+    function ptm_sc_profile_new() {
+        
+        global $wpdb;
+        
+        if( isset( $_POST['p_new'] ) ) {
+            
+            if( $wpdb->insert(
+                $wpdb->prefix . 'profile',
+                [
+                    'p_name' => $_POST['p_name']
+                ]
+            ) ) return _ptm( '
+                    <p>' . __( 'New profile was added successfully: ', 'ptm' ) . '<b>' . $_POST['p_name'] . '</b></p>
+                    <p>' . _ptm_link( 'profile', __( '&rarr; go to profile', 'ptm' ), [ 'id' => $wpdb->insert_id ] ) . '</p>
+                ', 'ptm_page' );
+            
+        }
+        
+        return _ptm( '
+            <div class="ptm_profile_new_header ptm_header">
+                ' . _ptm_link( 'profile', __( 'back', 'ptm' ), [], 'ptm_button ptm_hlink' ) . '
+                <h1>' . ucfirst( __( 'add new profile', 'ptm' ) ) . '</h1>
+            </div>
+            <p>' . __( 'Use the following form to create a new competitor profile.', 'ptm' ) . '</p>
+            <form action="' . $_SERVER['REQUEST_URI'] . '" method="post">
+                <div class="form-line">
+                    <label for="p_name">' . __( 'name', 'ptm' ) . '</label>
+                    <input type="text" id="p_name" name="p_name" required />
+                </div>
+                <div class="form-line">
+                    <button type="submit" name="p_new" value="1">' . __( 'add profile', 'ptm' ) . '</button>
+                </div>
+            </form>
+        ', 'ptm_profile_new_grid ptm_page' );
         
     }
     
