@@ -177,7 +177,10 @@
                 ]
             ) ) return _ptm( '
                     <p>' . __( 'New profile was added successfully: ', 'ptm' ) . '<b>' . $_POST['p_name'] . '</b></p>
-                    <p>' . _ptm_link( 'profile', __( '&rarr; go to profile', 'ptm' ), [ 'id' => $wpdb->insert_id ] ) . '</p>
+                    <p>
+                        ' . _ptm_link( 'profile', __( '&rarr; go to profile', 'ptm' ), [ 'id' => $wpdb->insert_id ] ) .
+                            __( ' or ', 'ptm' ) . _ptm_link( 'profile', __( 'add another', 'ptm' ), [ 'id' => 'new' ] ) . '
+                    </p>
                 ', 'ptm_page' );
             
         }
