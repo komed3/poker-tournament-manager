@@ -32,12 +32,7 @@
         }
         
         $levels = [];
-        $last = [
-            'level' => 1,
-            'sb' => 1,
-            'bb' => 1,
-            'ante' => 0
-        ];
+        $last = [ 'l' => 1, 'b' => 1, 'c' => 0 ];
         
         foreach( $wpdb->get_results( '
             SELECT      *
