@@ -308,6 +308,15 @@
                     ]
                 );
                 
+                $wpdb->insert(
+                    $wpdb->prefix . 'cash',
+                    [
+                        'c_profile' => $_POST['cp_profile'],
+                        'c_value' => $_POST['cp_buyin'] * (-1),
+                        'c_flag' => 'buyin'
+                    ]
+                );
+                
                 return _ptm( '
                     <p>' . __( 'New tournament competitor was added successfully.', 'ptm' ) . '</p>
                     <p>
