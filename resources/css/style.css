@@ -341,17 +341,43 @@ card.spades::before {
 }
 
 .ptm_live_table seat {
-    position: relative;
+    display: grid;
+    grid-template-columns: 40% 60%;
+    grid-template-rows: 1.5em 1.1em auto;
+    grid-template-areas:
+        'name  name'
+        'stack stack'
+        'bet   cards';
     padding: 8px 12px;
     background: var( --ptm-bg );
     box-shadow: var( --ptm-box-shadow );
 }
 
 .ptm_live_table seat .name {
+    grid-area: name;
     font-size: 1.5em;
 }
 
+.ptm_live_table seat .name::after {
+    content: attr( data-position );
+    float: right;
+    font-weight: 600;
+    opacity: 0.6;
+}
+
+.ptm_live_table seat .name[data-position="D"]::after,
+.ptm_live_table seat .name[data-position="SB"]::after,
+.ptm_live_table seat .name[data-position="BB"]::after {
+    opacity: 1;
+}
+
+
+.ptm_live_table seat .name[data-position="D"]::after {
+    color: var( --ptm-bad );
+}
+
 .ptm_live_table seat .stack {
+    grid-area: stack;
     font-size: 1.1em;
 }
 
@@ -361,9 +387,9 @@ card.spades::before {
 }
 
 .ptm_live_table seat .holecards {
-    position: absolute;
-    right: 12px;
-    bottom: 12px;
+    grid-area: cards;
+    justify-self: end;
+    align-self: end;
 }
 
 .ptm_live_table cc {
@@ -371,7 +397,7 @@ card.spades::before {
     justify-content: center;
     align-items: center;
     float: left;
-    margin-left: 12px;
+    margin: 0 5px;
     width: 90px;
     height: 60px;
     background: var( --ptm-lgray );

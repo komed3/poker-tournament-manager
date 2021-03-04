@@ -37,11 +37,11 @@
             LIMIT       0, 1
         ' );
         
+        $i = 0;
         $seats = [
             '<seat></seat>', '<seat></seat>', '<seat></seat>', '<seat></seat>',
             '<seat></seat>', '<seat></seat>', '<seat></seat>', '<seat></seat>'
         ];
-        $i = 0;
         
         foreach( $wpdb->get_results( '
             SELECT      *
@@ -60,8 +60,10 @@
                 AND     hc_profile = ' . $seat->p_id
             );
             
+            $position = _ptm_position( $stats->seats, $seat->s_seat, $hand->h_dealer );
+            
             $seats[ ++$i ] = '<seat data-s="' . $seat->s_seat . '" data-c="' . $seat->s_profile . '">
-                <div class="name">' . _ptm_link( 'competitor', $seat->p_name, [ 'tm' => $tm->tm_id, 'id' => $seat->p_id ] ) . '</div>
+                <div class="name" data-position="' . $position . '">' . _ptm_link( 'competitor', $seat->p_name, [ 'tm' => $tm->tm_id, 'id' => $seat->p_id ] ) . '</div>
                 <div class="stack">
                     <span>' . _ptm_stack( $seat->s_stack ) . '</span>
                     <span>' . number_format_i18n( $seat->s_stack / $stats->chips * 100, 1 ) . '&nbsp;%</span>

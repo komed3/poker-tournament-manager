@@ -208,4 +208,26 @@
         
     }
     
+    function _ptm_position(
+        $seats = null,
+        $seat = null,
+        $dealer = null
+    ) {
+        
+        if( $seats == null || $seat == null || $dealer == null )
+            return '';
+        
+        for( $i = -1; $i <= 7; $i++ ) {
+            
+            if( $seat == ( $dealer + $i > $seats ? $dealer + $i - $seats : $dealer + $i ) )
+                return [
+                    -1 => 'CO', 0 => 'D',   1 => 'SB',
+                     2 => 'BB', 3 => 'UTG', 4 => '+1',
+                     5 => '+2', 6=>  '+3',  7 => '+4'
+                ][ $i ];
+            
+        }
+        
+    }
+    
 ?>
