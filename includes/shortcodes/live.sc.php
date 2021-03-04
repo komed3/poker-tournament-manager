@@ -7,8 +7,98 @@
         if( !isset( $_GET['table'] ) )
             return ptm_sc_live_tables();
         
-        return _ptm( '
+        $table = $wpdb->get_row( '
+            SELECT  *
+            FROM    ' . $wpdb->prefix . 'table
+            WHERE   t_id = ' . $_GET['table']
+        );
+        
+        $stats = $wpdb->get_row( '
+            SELECT  COUNT( s_seat ) AS seats,
+                    SUM( s_stack ) AS chips
+            FROM    ' . $wpdb->prefix . 'seat
+            WHERE   s_table = ' . $table->t_id
+        );
+        
+        $tm = $wpdb->get_row( '
+            SELECT  *
+            FROM    ' . $wpdb->prefix . 'tournament,
+                    ' . $wpdb->prefix . 'level
+            WHERE   tm_id = ' . $table->t_tournament . '
+            AND     l_tournament = tm_id
+            AND     l_level = tm_level
+        ' );
+        
+        $hand = $wpdb->get_row( '
+            SELECT      *
+            FROM        ' . $wpdb->prefix . 'hand
+            WHERE       h_table = ' . $table->t_id . '
+            ORDER BY    h_hand DESC
+            LIMIT       0, 1
+        ' );
+        
+        $seats = [
+            '<seat></seat>', '<seat></seat>', '<seat></seat>', '<seat></seat>',
+            '<seat></seat>', '<seat></seat>', '<seat></seat>', '<seat></seat>'
+        ];
+        $i = 0;
+        
+        foreach( $wpdb->get_results( '
+            SELECT      *
+            FROM        ' . $wpdb->prefix . 'seat,
+                        ' . $wpdb->prefix . 'profile
+            WHERE       s_table = ' . $table->t_id . '
+            AND         p_id = s_profile
+            ORDER BY    s_stack DESC
+        ' ) as $seat ) {
             
+            $holecards = $wpdb->get_row( '
+                SELECT  *
+                FROM    ' . $wpdb->prefix . 'holecards
+                WHERE   hc_table = ' . $table->t_id . '
+                AND     hc_hand = ' . $hand->h_hand . '
+                AND     hc_profile = ' . $seat->p_id
+            );
+            
+            $seats[ ++$i ] = '<seat data-s="' . $seat->s_seat . '" data-c="' . $seat->s_profile . '">
+                <div class="name">' . _ptm_link( 'competitor', $seat->p_name, [ 'tm' => $tm->tm_id, 'id' => $seat->p_id ] ) . '</div>
+                <div class="stack">
+                    <span>' . _ptm_stack( $seat->s_stack ) . '</span>
+                    <span>' . number_format_i18n( $seat->s_stack / $stats->chips * 100, 1 ) . '&nbsp;%</span>
+                    <span>' . _ptm_ordinal( $i ) . __( ' in chips', 'ptm' ) . '</span>
+                </div>
+                <div class="action"></div>
+                <div class="holecards">
+                    <cc>' . _ptm_card( $holecards->hc_1 ) . '</cc>
+                    <cc>' . _ptm_card( $holecards->hc_2 ) . '</cc>
+                </div>
+            </seat>';
+            
+        }
+        
+        return _ptm( '
+            <div class="ptm_live_header">
+                <h1>' . _ptm_link( 'tournament', $tm->tm_name, [ 'id' => $tm->tm_id ] ) . ' – ' .
+                        _ptm_link( 'table', $table->t_name, [ 'tm' => $tm->tm_id, 'id' => $table->t_id ] ) . '</h1>
+            </div>
+            <div class="ptm_live_table">
+                ' . implode( '', $seats ) . '
+                <board>
+                    <div>
+                        <cc>' . _ptm_card( $hand->h_flop_1 ) . '</cc>
+                        <cc>' . _ptm_card( $hand->h_flop_2 ) . '</cc>
+                        <cc>' . _ptm_card( $hand->h_flop_3 ) . '</cc>
+                        <cc>' . _ptm_card( $hand->h_turn ) . '</cc>
+                        <cc>' . _ptm_card( $hand->h_river ) . '</cc>
+                    </div>
+                </board>
+                <blinds>
+                    <sb><span>' . number_format_i18n( $tm->l_sb ) . '</span></sb>
+                    <bb><span>' . number_format_i18n( $tm->l_bb ) . '</span></bb>
+                    <ante><span>' . number_format_i18n( $tm->l_ante ) . '</span></ante>
+                </blinds>
+                <pot><span>' . number_format_i18n( $hand->h_pot ) . '</span></pot>
+            </div>
         ', 'ptm_live_grid' );
         
     }

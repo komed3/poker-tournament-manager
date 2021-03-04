@@ -360,7 +360,7 @@
                 $seats = [];
                 $s = 0;
                 
-                for( $i = 1; $i <= 12; $i++ ) {
+                for( $i = 1; $i <= 8; $i++ ) {
                     
                     if( !isset( $_POST['seat_' . $i ] ) || empty( $_POST['seat_' . $i ] ) ||
                         in_array( $_POST['seat_' . $i ], $seats ) ) continue;
@@ -416,7 +416,7 @@
         
         $seats = [];
         
-        for( $i = 1; $i <= 12; $i++ ) {
+        for( $i = 1; $i <= 8; $i++ ) {
             
             $seats[] = '<div class="form-line">
                 <label for="seat_' . $i . '">' . __( 'seat ', 'ptm' ) . $i . '</label>

@@ -322,6 +322,160 @@ card.spades::before {
     font-size: 1.1em;
 }
 
+/* ptm live table */
+
+.ptm_live_header h1 {
+    margin-bottom: 1em;
+    text-align: center;
+}
+
+.ptm_live_table {
+    display: grid;
+    grid-template-columns: calc( 25% - 20px ) calc( 15% - 20px ) calc( 10% - 20px ) calc( 25% - 20px ) calc( 25% - 20px );
+    grid-template-rows: 150px 150px 150px;
+    gap: 20px;
+    grid-template-areas:
+        'seat_2 seat_3 seat_3 seat_4 seat_5'
+        'seat_1 board  board  board  seat_6'
+        'seat_8 blinds pot    pot    seat_7';
+}
+
+.ptm_live_table seat {
+    position: relative;
+    padding: 8px 12px;
+    background: var( --ptm-bg );
+    box-shadow: var( --ptm-box-shadow );
+}
+
+.ptm_live_table seat .name {
+    font-size: 1.5em;
+}
+
+.ptm_live_table seat .stack {
+    font-size: 1.1em;
+}
+
+.ptm_live_table seat .stack span:not(:last-child)::after {
+    content: ' •';
+    opacity: 0.5;
+}
+
+.ptm_live_table seat .holecards {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+}
+
+.ptm_live_table cc {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    float: left;
+    margin-left: 12px;
+    width: 90px;
+    height: 60px;
+    background: var( --ptm-lgray );
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    box-shadow: var( --ptm-box-shadow );
+}
+
+.ptm_live_table cc card {
+    flex: 0 0 1px;
+    padding-right: 0;
+    font-size: 2em;
+}
+
+.ptm_live_table seat[data-s="1"] {
+    grid-area: seat_1;
+}
+
+.ptm_live_table seat[data-s="2"] {
+    grid-area: seat_2;
+}
+
+.ptm_live_table seat[data-s="3"] {
+    grid-area: seat_3;
+}
+
+.ptm_live_table seat[data-s="4"] {
+    grid-area: seat_4;
+}
+
+.ptm_live_table seat[data-s="5"] {
+    grid-area: seat_5;
+}
+
+.ptm_live_table seat[data-s="6"] {
+    grid-area: seat_6;
+}
+
+.ptm_live_table seat[data-s="7"] {
+    grid-area: seat_7;
+}
+
+.ptm_live_table seat[data-s="8"] {
+    grid-area: seat_8;
+}
+
+.ptm_live_table board {
+    grid-area: board;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.ptm_live_table board cc {
+    width: 120px;
+    height: 90px;
+}
+
+.ptm_live_table board cc card {
+    font-size: 3em;
+}
+
+.ptm_live_table blinds {
+    grid-area: blinds;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: flex-end;
+    opacity: 0.6;
+}
+
+.ptm_live_table blinds sb::before {
+    content: 'SB ';
+}
+
+.ptm_live_table blinds bb::before {
+    content: 'BB ';
+}
+
+.ptm_live_table blinds ante::before {
+    content: 'ANTE ';
+}
+
+.ptm_live_table pot {
+    grid-area: pot;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.ptm_live_table pot span {
+    flex: 0 0 1px;
+    font-size: 2.5em;
+    font-weight: 600;
+}
+
+.ptm_live_table blinds span::before,
+.ptm_live_table pot span::before {
+    content: '$';
+    padding-right: 0.2em;
+    font-size: 0.7em;
+    font-weight: normal;
+}
+
 /* charts */
 
 #ptm_chart_cash {
