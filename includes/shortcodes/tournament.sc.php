@@ -90,7 +90,7 @@
                     <li>' . _ptm_link( 'table', __( 'Tournament tables', 'ptm' ), [ 'tm' => $tm->tm_id ] ) . '</li>
                     <li>' . _ptm_link( 'level', __( 'Levels and Blind structure', 'ptm' ), [ 'tm' => $tm->tm_id ] ) . '</li>
                     <li>' . _ptm_link( 'competitor', __( 'Competitors', 'ptm' ), [ 'tm' => $tm->tm_id ] ) . '</li>
-                    <li>' . _ptm_link( 'payout', __( 'Payout spread', 'ptm' ), [ 'tm' => $tm->tm_id ] ) . '</li>
+                    <li>' . _ptm_link( 'payout', __( 'Payout structure', 'ptm' ), [ 'tm' => $tm->tm_id ] ) . '</li>
                 </ul>
             </div>
             ' . ptm_sc_tournament_payout( $tm ) . '
