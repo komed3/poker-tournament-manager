@@ -332,7 +332,7 @@ card.spades::before {
 .ptm_live_table {
     display: grid;
     grid-template-columns: calc( 25% - 20px ) calc( 15% - 20px ) calc( 10% - 20px ) calc( 25% - 20px ) calc( 25% - 20px );
-    grid-template-rows: 150px 150px 150px;
+    grid-template-rows: 160px 160px 160px;
     gap: 20px;
     grid-template-areas:
         'seat_2 seat_3 seat_3 seat_4 seat_5'
@@ -343,19 +343,20 @@ card.spades::before {
 .ptm_live_table seat {
     display: grid;
     grid-template-columns: 40% 60%;
-    grid-template-rows: 1.5em 1.1em auto;
+    grid-template-rows: 30px 18px auto 30px;
     grid-template-areas:
-        'name  name'
-        'stack stack'
-        'bet   cards';
-    padding: 8px 12px;
+        'name    name   '
+        'stack   stack  '
+        'bet     cards  '
+        'actions actions';
     background: var( --ptm-bg );
     box-shadow: var( --ptm-box-shadow );
 }
 
 .ptm_live_table seat .name {
     grid-area: name;
-    font-size: 1.5em;
+    padding: 4px 8px;
+    font-size: 22px;
 }
 
 .ptm_live_table seat .name::after {
@@ -371,14 +372,14 @@ card.spades::before {
     opacity: 1;
 }
 
-
 .ptm_live_table seat .name[data-position="D"]::after {
     color: var( --ptm-bad );
 }
 
 .ptm_live_table seat .stack {
     grid-area: stack;
-    font-size: 1.1em;
+    padding: 0 8px;
+    font-size: 18px;
 }
 
 .ptm_live_table seat .stack span:not(:last-child)::after {
@@ -386,10 +387,17 @@ card.spades::before {
     opacity: 0.5;
 }
 
+.ptm_live_table seat .bet {
+    grid-area: bet;
+    justify-self: center;
+    align-self: center;
+}
+
 .ptm_live_table seat .holecards {
     grid-area: cards;
     justify-self: end;
     align-self: end;
+    padding: 0 5px;
 }
 
 .ptm_live_table cc {
@@ -398,7 +406,7 @@ card.spades::before {
     align-items: center;
     float: left;
     margin: 0 5px;
-    width: 90px;
+    width: 80px;
     height: 60px;
     background: var( --ptm-lgray );
     border-top-left-radius: 10px;
@@ -409,7 +417,47 @@ card.spades::before {
 .ptm_live_table cc card {
     flex: 0 0 1px;
     padding-right: 0;
-    font-size: 2em;
+    font-size: 32px;
+}
+
+.ptm_live_table seat .actions {
+    grid-area: actions;
+    display: flex;
+    flex-flow: row nowrap;
+    border-top: 1px solid var( --ptm-mgray );
+}
+
+.ptm_live_table seat .actions > * {
+    flex: 1 0 auto;
+    height: 30px;
+    padding: 0;
+    line-height: 30px;
+    font-size: 14px;
+    border: 0;
+    border-radius: 0;
+    outline: 0 none;
+}
+
+.ptm_live_table seat .actions input[name="bet"] {
+    padding-left: 8px;
+}
+
+.ptm_live_table seat .actions button {
+    color: var( --ptm-text );
+    background: var( --ptm-lgray );
+}
+
+.ptm_live_table seat .actions button:hover {
+    background: var( --ptm-mgray );
+}
+
+.ptm_live_table seat .actions button[data-action="fold"] {
+    color: var( --ptm-bad );
+}
+
+.ptm_live_table seat .actions button[data-action="fold"]:hover {
+    color: var( --ptm-bg );
+    background: var( --ptm-bad );
 }
 
 .ptm_live_table seat[data-s="1"] {
@@ -454,6 +502,7 @@ card.spades::before {
 .ptm_live_table board cc {
     width: 120px;
     height: 90px;
+    border-radius: 10px;
 }
 
 .ptm_live_table board cc card {
@@ -469,6 +518,10 @@ card.spades::before {
     opacity: 0.6;
 }
 
+.ptm_live_table blinds level::before {
+    content: 'LEVEL ';
+}
+
 .ptm_live_table blinds sb::before {
     content: 'SB ';
 }
@@ -481,20 +534,33 @@ card.spades::before {
     content: 'ANTE ';
 }
 
-.ptm_live_table pot {
-    grid-area: pot;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-.ptm_live_table pot span {
-    flex: 0 0 1px;
-    font-size: 2.5em;
+.ptm_live_table blinds span {
     font-weight: 600;
 }
 
-.ptm_live_table blinds span::before,
+.ptm_live_table pot {
+    grid-area: pot;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.ptm_live_table pot > span {
+    flex: 0 0 1px;
+    font-weight: 600;
+}
+
+.ptm_live_table pot .rpot {
+    font-size: 1.6em;
+    opacity: 0.7;
+}
+
+.ptm_live_table pot .pot {
+    font-size: 2.6em;
+}
+
+.ptm_live_table blinds :not(level) span::before,
 .ptm_live_table pot span::before {
     content: '$';
     padding-right: 0.2em;

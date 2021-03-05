@@ -69,10 +69,17 @@
                     <span>' . number_format_i18n( $seat->s_stack / $stats->chips * 100, 1 ) . '&nbsp;%</span>
                     <span>' . _ptm_ordinal( $i ) . __( ' in chips', 'ptm' ) . '</span>
                 </div>
-                <div class="action"></div>
+                <div class="bet"></div>
                 <div class="holecards">
                     <cc>' . _ptm_card( $holecards->hc_1 ) . '</cc>
                     <cc>' . _ptm_card( $holecards->hc_2 ) . '</cc>
+                </div>
+                <div class="actions">
+                    <input type="number" name="bet" min="0" max="' . $seat->s_stack . '" />
+                    <button data-action="bet">' . __( 'Bet', 'ptm' ) . '</button>
+                    <button data-action="call">' . __( 'Call', 'ptm' ) . '</button>
+                    <button data-action="check">' . __( 'Check', 'ptm' ) . '</button>
+                    <button data-action="fold">' . __( 'Fold', 'ptm' ) . '</button>
                 </div>
             </seat>';
             
@@ -95,11 +102,15 @@
                     </div>
                 </board>
                 <blinds>
+                    <level><span>' . number_format_i18n( $tm->l_level ) . '</span></level>
                     <sb><span>' . number_format_i18n( $tm->l_sb ) . '</span></sb>
                     <bb><span>' . number_format_i18n( $tm->l_bb ) . '</span></bb>
                     <ante><span>' . number_format_i18n( $tm->l_ante ) . '</span></ante>
                 </blinds>
-                <pot><span>' . number_format_i18n( $hand->h_pot ) . '</span></pot>
+                <pot>
+                    <span class="rpot">' . number_format_i18n( $hand->h_rpot ) . '</span>
+                    <span class="pot">' . number_format_i18n( $hand->h_pot ) . '</span>
+                </pot>
             </div>
         ', 'ptm_live_grid' );
         
