@@ -29,22 +29,6 @@
             AND     l_level = tm_level
         ' );
         
-        if( isset( $_POST['h_new'] ) ) {
-            
-            $wpdb->insert(
-                $wpdb->prefix . 'hand',
-                [
-                    'h_table' => $table->t_id,
-                    'h_hand' => $_POST['h_new'],
-                    'h_level' => $tm->l_level,
-                    'h_dealer' => $_POST['h_dealer']
-                ]
-            );
-            
-            return '<script> location.href = "' . $_SERVER['REQUEST_URI'] . '"; </script>';
-            
-        }
-        
         $hand = $wpdb->get_row( '
             SELECT      *
             FROM        ' . $wpdb->prefix . 'hand
@@ -53,13 +37,41 @@
             LIMIT       0, 1
         ' );
         
+        # ACTION ----------------------------------------------------- #
+        
+        if( isset( $_POST['h_new'] ) ) {
+            
+            $wpdb->insert(
+                $wpdb->prefix . 'hand',
+                [
+                    'h_table' => $table->t_id,
+                    'h_hand' => $_POST['h_new'],
+                    'h_level' => $tm->l_level,
+                    'h_dealer' => $_POST['h_dealer'],
+                    'h_sb' => $_POST['h_sb'],
+                    'h_bb' => $_POST['h_bb']
+                ]
+            );
+            
+            _ptm_bet( $tm, $table, $_POST['h_new'], $_POST['h_sb'], $tm->l_sb );
+            _ptm_bet( $tm, $table, $_POST['h_new'], $_POST['h_bb'], $tm->l_bb );
+            
+            if( $tm->tm_ante == 'button' )
+                _ptm_bet( $tm, $table, $_POST['h_new'], $_POST['h_bb'], $tm->l_ante );
+            
+            return '<script> location.href = "' . $_SERVER['REQUEST_URI'] . '"; </script>';
+            
+        }
+        
+        # ACTION END ------------------------------------------------- #
+        
         $i = 0;
         $seats = [
             '<seat></seat>', '<seat></seat>', '<seat></seat>', '<seat></seat>',
             '<seat></seat>', '<seat></seat>', '<seat></seat>', '<seat></seat>'
         ];
         
-        $players = [];
+        $player_select = [];
         
         $next_dealer = 0;
         
@@ -73,7 +85,7 @@
             ORDER BY    s_stack DESC
         ' ) as $seat ) {
             
-            $players[ $seat->s_seat ] = $seat->p_name;
+            $player_select[ $seat->s_seat ] = '<option value="' . $seat->s_seat . '">' . $seat->p_name . '</option>';
             
             $holecards = $wpdb->get_row( '
                 SELECT  *
@@ -83,10 +95,9 @@
                 AND     hc_profile = ' . $seat->p_id
             );
             
-            $position = _ptm_position( $stats->seats, $seat->s_seat, $hand->h_dealer );
-            
-            if( $position == 'SB' )
-                $next_dealer = $seat->s_seat;
+            $position = ( $seat->s_seat == $hand->h_dealer ? 'D' :
+                ( $seat->s_seat == $hand->h_sb ? 'SB' :
+                    ( $seat->s_seat == $hand->h_bb ? 'BB' : null ) ) );
             
             $seats[ ++$i ] = '<seat data-s="' . $seat->s_seat . '" data-c="' . $seat->s_profile . '">
                 <div class="name" data-position="' . $position . '">' . _ptm_link( 'competitor', $seat->p_name, [ 'tm' => $tm->tm_id, 'id' => $seat->p_id ] ) . '</div>
@@ -111,10 +122,8 @@
             
         }
         
-        $dealer_select = '';
-        foreach( $players as $seat => $name )
-            $dealer_select .= '<option value="' . $seat . '" ' . ( $seat == $next_dealer ? 'selected' : '' ) . '>' . $name . '</option>';
-        
+        ksort( $player_select );
+                
         wp_enqueue_script( 'ptm.js.live', $ptm_path . 'js/live.js', [ 'jquery', 'jquery-ui-core', 'jquery-ui-tabs', 'ptm.js.global' ] );
         
         return _ptm( '
@@ -157,7 +166,11 @@
                     <div id="ptm_live_tabs_hand">
                         <form action="' . $_SERVER['REQUEST_URI'] . '" method="post">
                             <label for="tab_h_dealer">' . __( 'dealer', 'ptm' ) . '</label>
-                            <select name="h_dealer" id="tab_h_dealer">' . $dealer_select . '</select>
+                            <select name="h_dealer" id="tab_h_dealer">' . implode( '', $player_select ) . '</select>
+                            <label for="tab_h_sb">' . __( 'SB', 'ptm' ) . '</label>
+                            <select name="h_sb" id="tab_h_sb">' . implode( '', $player_select ) . '</select>
+                            <label for="tab_h_bb">' . __( 'BB', 'ptm' ) . '</label>
+                            <select name="h_bb" id="tab_h_bb">' . implode( '', $player_select ) . '</select>
                             <button type="submit" name="h_new" value="' . ( $hand->h_hand + 1 ) . '">' . __( 'new hand', 'ptm' ) . '</button>
                         </form>
                     </div>

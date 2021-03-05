@@ -27,7 +27,7 @@
         
         $stats = $wpdb->get_row( '
             SELECT  COUNT( s_seat ) AS seats,
-                    SUM( s_stack ) AS chips
+                    SUM( s_entry ) AS chips
             FROM    ' . $wpdb->prefix . 'seat
             WHERE   s_table = ' . $table->t_id
         );
@@ -56,6 +56,13 @@
                         s_seat ASC
         ' ) as $seat ) {
             
+            if( $seat->s_stack < $hstack ) {
+                
+                $hstack = $seat->s_stack;
+                $i++;
+                
+            }
+            
             $seats[] = '<tr>
                 <td>' . number_format_i18n( $seat->s_seat ) . '</td>
                 <td>' . _ptm_link( 'competitor', $seat->p_name, [ 'tm' => $tm->tm_id, 'id' => $seat->p_id ] ) . '</td>
@@ -66,13 +73,6 @@
                            <td>' . number_format_i18n( $seat->s_stack / $stats->chips * 100, 1 ) . '&nbsp;%</td>
                            <td>' . _ptm_ordinal( $i ) . __( ' in chips' ) . '</td>' ) . '
             </tr>';
-            
-            if( $seat->s_stack < $hstack ) {
-                
-                $hstack = $seat->s_stack;
-                $i++;
-                
-            }
             
         }
         
@@ -228,7 +228,7 @@
             
             $stats = $wpdb->get_row( '
                 SELECT  COUNT( s_seat ) AS seats,
-                        SUM( s_stack ) AS chips
+                        SUM( s_entry ) AS chips
                 FROM    ' . $wpdb->prefix . 'seat
                 WHERE   s_table = ' . $table->t_id
             );

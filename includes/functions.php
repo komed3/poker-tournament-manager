@@ -208,6 +208,78 @@
         
     }
     
+    function _ptm_bet(
+        $tm,
+        $table = null,
+        $hand = null,
+        $seat = null,
+        $bet = 0,
+        $flag = null
+    ) {
+        
+        global $wpdb;
+        
+        $profile = $wpdb->get_row( '
+            SELECT  s_profile
+            FROM    ' . $wpdb->prefix . 'seat
+            WHERE   s_table = ' . $table->t_id . '
+            AND     s_seat = ' . $seat
+        )->s_profile;
+        
+        $stack = $wpdb->get_row( '
+            SELECT      cp_stack
+            FROM        ' . $wpdb->prefix . 'competitor
+            WHERE       cp_tournament = ' . $tm->tm_id . '
+            AND         cp_profile = ' . $profile
+        )->cp_stack;
+        
+        $wpdb->query( '
+            INSERT INTO ' . $wpdb->prefix . 'stack (
+                st_profile, st_tournament, st_table, st_hand, st_flag, st_value, st_change
+            ) VALUES (
+                ' . $profile . ', ' . $tm->tm_id . ', ' . $table->t_id . ', ' . $hand . ',
+                ' . ( $flag == null ? 'NULL' : '"' . $flag . '"' ) . ',
+                ' . ( $stack + $bet * (-1) ) . ', ' . ( $bet * (-1) ) . '
+            ) ON DUPLICATE KEY UPDATE
+                st_flag	= ' . ( $flag == null ? 'NULL' : '"' . $flag . '"' ) . ',
+                st_value = ' . ( $stack + $bet * (-1) ) . ',
+                st_change = st_change + ' . ( $bet * (-1) ) . '
+        ' );
+        
+        $wpdb->update(
+            $wpdb->prefix . 'seat',
+            [
+                's_stack' => $stack + $bet * (-1)
+            ],
+            [
+                's_table' => $table->t_id,
+                's_seat' => $seat
+            ]
+        );
+        
+        $wpdb->update(
+            $wpdb->prefix . 'competitor',
+            [
+                'cp_stack' => $stack + $bet * (-1)
+            ],
+            [
+                'cp_tournament' => $tm->tm_id,
+                'cp_profile' => $profile
+            ]
+        );
+        
+        $wpdb->query( '
+            UPDATE  ' . $wpdb->prefix . 'hand
+            SET     h_rpot = h_rpot + ' . $bet . ',
+                    h_pot = h_pot + ' . $bet . '
+            WHERE   h_table = ' . $table->t_id . '
+            AND     h_hand = ' . $hand
+        );
+        
+        return true;
+        
+    }
+    
     function _ptm_position(
         $seats = null,
         $seat = null,

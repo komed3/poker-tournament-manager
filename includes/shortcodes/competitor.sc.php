@@ -299,16 +299,6 @@
                 );
                 
                 $wpdb->insert(
-                    $wpdb->prefix . 'stack',
-                    [
-                        'st_profile' => $_POST['cp_profile'],
-                        'st_tournament' => $tm->tm_id,
-                        'st_flag' => 'buyin',
-                        'st_value' => $_POST['cp_stack']
-                    ]
-                );
-                
-                $wpdb->insert(
                     $wpdb->prefix . 'cash',
                     [
                         'c_profile' => $_POST['cp_profile'],

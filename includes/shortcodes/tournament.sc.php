@@ -289,7 +289,7 @@
                     'tm_rebuy' => $_POST['tm_rebuy'],
                     'tm_stack' => $_POST['tm_stack'],
                     'tm_restack' => $_POST['tm_restack'],
-                    'tm_leveltime' => $_POST['tm_leveltime'],
+                    'tm_ante' => $_POST['tm_ante'],
                     'tm_payout_pct' => $_POST['tm_payout_pct']
                 ]
             ) ) return _ptm( '
@@ -324,19 +324,22 @@
                 </div>
                 <div class="form-line">
                     <label for="tm_stack">' . __( 'entry stack (Chips)', 'ptm' ) . '</label>
-                    <input type="number" id="tm_stack" name="tm_stack" value="1000" min="0" />
+                    <input type="number" id="tm_stack" name="tm_stack" value="1000" min="0" required />
                 </div>
                 <div class="form-line">
                     <label for="tm_restack">' . __( 're-entry stack (Chips)', 'ptm' ) . '</label>
-                    <input type="number" id="tm_restack" name="tm_restack" value="1000" min="0" />
+                    <input type="number" id="tm_restack" name="tm_restack" value="1000" min="0" required />
                 </div>
                 <div class="form-line">
-                    <label for="tm_leveltime">' . __( 'time per level (min)', 'ptm' ) . '</label>
-                    <input type="number" id="tm_leveltime" name="tm_leveltime" value="45" min="20" step="1" />
+                    <label for="tm_ante">' . __( 'Ante', 'ptm' ) . '</label>
+                    <select id="tm_ante" name="tm_ante" required>
+                        <option value="button">' . __( 'Button-Ante', 'ptm' ) . '</option>
+                        <option value="all">' . __( 'Ante for all players', 'ptm' ) . '</option>
+                    </select>
                 </div>
                 <div class="form-line">
                     <label for="tm_payout_pct">' . __( 'price pool size (percent of total buy-in cash)', 'ptm' ) . '</label>
-                    <input type="number" id="tm_payout_pct" name="tm_payout_pct" value="0.95" min="0" max="1" step="0.05" />
+                    <input type="number" id="tm_payout_pct" name="tm_payout_pct" value="0.95" min="0" max="1" step="0.05" required />
                 </div>
                 <div class="form-line">
                     <button type="submit" name="tm_new" value="1">' . __( 'create tournament', 'ptm' ) . '</button>
