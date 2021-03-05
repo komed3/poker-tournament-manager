@@ -101,15 +101,18 @@
                         <cc>' . _ptm_card( $hand->h_river ) . '</cc>
                     </div>
                 </board>
-                <blinds>
-                    <level><span>' . number_format_i18n( $tm->l_level ) . '</span></level>
-                    <sb><span>' . number_format_i18n( $tm->l_sb ) . '</span></sb>
-                    <bb><span>' . number_format_i18n( $tm->l_bb ) . '</span></bb>
-                    <ante><span>' . number_format_i18n( $tm->l_ante ) . '</span></ante>
-                </blinds>
                 <pot>
-                    <span class="rpot">' . number_format_i18n( $hand->h_rpot ) . '</span>
-                    <span class="pot">' . number_format_i18n( $hand->h_pot ) . '</span>
+                    <div class="blinds">
+                        <level><span>' . number_format_i18n( $tm->l_level ) . '</span></level>
+                        <sb><span>' . number_format_i18n( $tm->l_sb ) . '</span></sb>
+                        <bb><span>' . number_format_i18n( $tm->l_bb ) . '</span></bb>
+                        <ante><span>' . number_format_i18n( $tm->l_ante ) . '</span></ante>
+                        <hand><span>' . number_format_i18n( $hand->h_hand ) . '</span></hand>
+                    </div>
+                    <div class="pot">
+                        <div class="pot_rpot"><span>' . number_format_i18n( $hand->h_rpot ) . '</span></div>
+                        <div class="pot_pot"><span>' . number_format_i18n( $hand->h_pot ) . '</span></div>
+                    </div>
                 </pot>
             </div>
         ', 'ptm_live_grid' );

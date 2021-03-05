@@ -331,13 +331,13 @@ card.spades::before {
 
 .ptm_live_table {
     display: grid;
-    grid-template-columns: calc( 25% - 20px ) calc( 15% - 20px ) calc( 10% - 20px ) calc( 25% - 20px ) calc( 25% - 20px );
+    grid-template-columns: calc( 25% - 20px ) calc( 25% - 20px ) calc( 25% - 20px ) calc( 25% - 20px );
     grid-template-rows: 160px 160px 160px;
     gap: 20px;
     grid-template-areas:
-        'seat_2 seat_3 seat_3 seat_4 seat_5'
-        'seat_1 board  board  board  seat_6'
-        'seat_8 blinds pot    pot    seat_7';
+        'seat_2 seat_3 seat_4 seat_5'
+        'seat_1 board  board  seat_6'
+        'seat_8 pot    pot    seat_7';
 }
 
 .ptm_live_table seat {
@@ -496,7 +496,7 @@ card.spades::before {
     grid-area: board;
     display: flex;
     justify-content: center;
-    align-items: flex-end;
+    align-items: center;
 }
 
 .ptm_live_table board cc {
@@ -509,63 +509,82 @@ card.spades::before {
     font-size: 3em;
 }
 
-.ptm_live_table blinds {
-    grid-area: blinds;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: flex-end;
-    opacity: 0.6;
-}
-
-.ptm_live_table blinds level::before {
-    content: 'LEVEL ';
-}
-
-.ptm_live_table blinds sb::before {
-    content: 'SB ';
-}
-
-.ptm_live_table blinds bb::before {
-    content: 'BB ';
-}
-
-.ptm_live_table blinds ante::before {
-    content: 'ANTE ';
-}
-
-.ptm_live_table blinds span {
-    font-weight: 600;
-}
-
 .ptm_live_table pot {
     grid-area: pot;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 35% 65%;
+    grid-template-rows: auto;
+    gap: 0 20px;
+    align-items: center;
+    grid-template-areas: 'blinds pot';
 }
 
-.ptm_live_table pot > span {
-    flex: 0 0 1px;
-    font-weight: 600;
-}
-
-.ptm_live_table pot .rpot {
-    font-size: 1.6em;
+.ptm_live_table pot .blinds {
+    grid-area: blinds;
+    justify-self: end;
+    text-align: right;
     opacity: 0.7;
 }
 
-.ptm_live_table pot .pot {
-    font-size: 2.6em;
+.ptm_live_table pot .blinds > * {
+    display: block;
 }
 
-.ptm_live_table blinds :not(level) span::before,
-.ptm_live_table pot span::before {
+.ptm_live_table pot .blinds level::before {
+    content: 'LEVEL ';
+}
+
+.ptm_live_table pot .blinds sb::before {
+    content: 'SB ';
+}
+
+.ptm_live_table pot .blinds bb::before {
+    content: 'BB ';
+}
+
+.ptm_live_table pot .blinds ante::before {
+    content: 'ANTE ';
+}
+
+.ptm_live_table pot .blinds hand::before {
+    content: 'HAND ';
+}
+
+.ptm_live_table pot .blinds span {
+    font-weight: 600;
+}
+
+.ptm_live_table pot .pot {
+    grid-area: pot;
+    line-height: 1;
+}
+
+.ptm_live_table pot .pot > *::after {
+    display: block;
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.ptm_live_table pot .pot .pot_rpot::after {
+    content: 'BETS';
+}
+
+.ptm_live_table pot .pot .pot_pot::after {
+    content: 'TOTAL';
+}
+
+.ptm_live_table pot .pot > * span::before {
     content: '$';
-    padding-right: 0.2em;
-    font-size: 0.7em;
-    font-weight: normal;
+    padding-right: 0.2rem;
+    font-size: 1.2rem;
+}
+
+.ptm_live_table pot .pot .pot_rpot span {
+    font-size: 1.6em;
+}
+
+.ptm_live_table pot .pot .pot_pot span {
+    font-size: 2.6em;
 }
 
 /* charts */
