@@ -12,9 +12,3 @@ var highcharts_options = {
     title: { text: null }
     
 };
-
-jQuery( document ).ready( function( $ ) {
-    
-    
-    
-} );

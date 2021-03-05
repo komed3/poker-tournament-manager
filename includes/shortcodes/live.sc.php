@@ -2,7 +2,7 @@
     
     function ptm_sc_live() {
         
-        global $wpdb;
+        global $wpdb, $ptm_path;
         
         if( !isset( $_GET['table'] ) )
             return ptm_sc_live_tables();
@@ -29,6 +29,22 @@
             AND     l_level = tm_level
         ' );
         
+        if( isset( $_POST['h_new'] ) ) {
+            
+            $wpdb->insert(
+                $wpdb->prefix . 'hand',
+                [
+                    'h_table' => $table->t_id,
+                    'h_hand' => $_POST['h_new'],
+                    'h_level' => $tm->l_level,
+                    'h_dealer' => $_POST['h_dealer']
+                ]
+            );
+            
+            return '<script> location.href = "' . $_SERVER['REQUEST_URI'] . '"; </script>';
+            
+        }
+        
         $hand = $wpdb->get_row( '
             SELECT      *
             FROM        ' . $wpdb->prefix . 'hand
@@ -43,14 +59,21 @@
             '<seat></seat>', '<seat></seat>', '<seat></seat>', '<seat></seat>'
         ];
         
+        $players = [];
+        
+        $next_dealer = 0;
+        
         foreach( $wpdb->get_results( '
             SELECT      *
             FROM        ' . $wpdb->prefix . 'seat,
                         ' . $wpdb->prefix . 'profile
             WHERE       s_table = ' . $table->t_id . '
             AND         p_id = s_profile
+            AND         s_stack > 0
             ORDER BY    s_stack DESC
         ' ) as $seat ) {
+            
+            $players[ $seat->s_seat ] = $seat->p_name;
             
             $holecards = $wpdb->get_row( '
                 SELECT  *
@@ -61,6 +84,9 @@
             );
             
             $position = _ptm_position( $stats->seats, $seat->s_seat, $hand->h_dealer );
+            
+            if( $position == 'SB' )
+                $next_dealer = $seat->s_seat;
             
             $seats[ ++$i ] = '<seat data-s="' . $seat->s_seat . '" data-c="' . $seat->s_profile . '">
                 <div class="name" data-position="' . $position . '">' . _ptm_link( 'competitor', $seat->p_name, [ 'tm' => $tm->tm_id, 'id' => $seat->p_id ] ) . '</div>
@@ -84,6 +110,12 @@
             </seat>';
             
         }
+        
+        $dealer_select = '';
+        foreach( $players as $seat => $name )
+            $dealer_select .= '<option value="' . $seat . '" ' . ( $seat == $next_dealer ? 'selected' : '' ) . '>' . $name . '</option>';
+        
+        wp_enqueue_script( 'ptm.js.live', $ptm_path . 'js/live.js', [ 'jquery', 'jquery-ui-core', 'jquery-ui-tabs', 'ptm.js.global' ] );
         
         return _ptm( '
             <div class="ptm_live_header">
@@ -114,6 +146,28 @@
                         <div class="pot_pot"><span>' . number_format_i18n( $hand->h_pot ) . '</span></div>
                     </div>
                 </pot>
+            </div>
+            <div class="ptm_live_tabs">
+                <div id="ptm_live_tabs_container">
+                    <ul>
+                        <li><a href="#ptm_live_tabs_hand">' . __( 'new hand', 'ptm' ) . '</a></li>
+                        <li><a href="#ptm_live_tabs_pot">' . __( 'payout pot', 'ptm' ) . '</a></li>
+                        <li><a href="#ptm_live_tabs_settings">' . __( 'settings', 'ptm' ) . '</a></li>
+                    </ul>
+                    <div id="ptm_live_tabs_hand">
+                        <form action="' . $_SERVER['REQUEST_URI'] . '" method="post">
+                            <label for="tab_h_dealer">' . __( 'dealer', 'ptm' ) . '</label>
+                            <select name="h_dealer" id="tab_h_dealer">' . $dealer_select . '</select>
+                            <button type="submit" name="h_new" value="' . ( $hand->h_hand + 1 ) . '">' . __( 'new hand', 'ptm' ) . '</button>
+                        </form>
+                    </div>
+                    <div id="ptm_live_tabs_pot">
+                        ...
+                    </div>
+                    <div id="ptm_live_tabs_settings">
+                        ...
+                    </div>
+                </div>
             </div>
         ', 'ptm_live_grid' );
         
