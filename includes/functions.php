@@ -1,8 +1,10 @@
 <?php
     
+    $_ptm_cards = [];
+    
     function _ptm_init() {
         
-        global $wpdb, $ptm_pages;
+        global $wpdb, $ptm_pages, $_ptm_cards;
         
         foreach( [ 'profile', 'tournament', 'table', 'competitor', 'level', 'payout', 'live' ] as $page ) {
             
@@ -12,6 +14,16 @@
                 WHERE   post_content LIKE "%[ptm_' . $page . ']%"
                 AND     post_status = "publish"
             ' )->ID;
+            
+        }
+        
+        foreach( str_split( 'CDHS' ) as $color ) {
+            
+            foreach( str_split( '23456789TJQKA' ) as $value ) {
+                
+                $_ptm_cards[] = $color . $value;
+                
+            }
             
         }
         
@@ -277,6 +289,156 @@
         );
         
         return true;
+        
+    }
+    
+    function _ptm_get_hc(
+        $table = null,
+        $hand = null,
+        $profile = null,
+        $hc1 = null,
+        $hc2 = null
+    ) {
+        
+        global $wpdb;
+        
+        return $wpdb->insert(
+            $wpdb->prefix . 'holecards',
+            [
+                'hc_table' => $table,
+                'hc_hand' => $hand,
+                'hc_profile' => $profile,
+                'hc_1' => $hc1,
+                'hc_2' => $hc2
+            ]
+        );
+        
+    }
+    
+    function _ptm_fold(
+        $table = null,
+        $hand = null,
+        $profile = null
+    ) {
+        
+        global $wpdb;
+        
+        return $wpdb->update(
+            $wpdb->prefix . 'holecards',
+            [ 'hc_fold' => true ],
+            [
+                'hc_table' => $table,
+                'hc_hand' => $hand,
+                'hc_profile' => $profile
+            ]
+        );
+        
+    }
+    
+    function _ptm_flop(
+        $table = null,
+        $hand = null,
+        $card1 = null,
+        $card2 = null,
+        $card3 = null
+    ) {
+        
+        global $wpdb;
+        
+        return $wpdb->update(
+            $wpdb->prefix . 'hand',
+            [
+                'h_flop_1' => $card1,
+                'h_flop_2' => $card2,
+                'h_flop_3' => $card3,
+                'h_rpot' => 0
+            ],
+            [
+                'h_table' => $table,
+                'h_hand' => $hand,
+            ]
+        );
+        
+    }
+    
+    function _ptm_turn(
+        $table = null,
+        $hand = null,
+        $card = null
+    ) {
+        
+        global $wpdb;
+        
+        return $wpdb->update(
+            $wpdb->prefix . 'hand',
+            [
+                'h_turn' => $card,
+                'h_rpot' => 0
+            ],
+            [
+                'h_table' => $table,
+                'h_hand' => $hand,
+            ]
+        );
+        
+    }
+    
+    function _ptm_river(
+        $table = null,
+        $hand = null,
+        $card = null
+    ) {
+        
+        global $wpdb;
+        
+        return $wpdb->update(
+            $wpdb->prefix . 'hand',
+            [
+                'h_river' => $card,
+                'h_rpot' => 0
+            ],
+            [
+                'h_table' => $table,
+                'h_hand' => $hand,
+            ]
+        );
+        
+    }
+    
+    function _ptm_termination(
+        $table = null,
+        $hand = null,
+        $termination = null
+    ) {
+        
+        global $wpdb;
+        
+        return $wpdb->update(
+            $wpdb->prefix . 'hand',
+            [
+                'h_termination' => $termination,
+                'h_rpot' => 0
+            ],
+            [
+                'h_table' => $table,
+                'h_hand' => $hand,
+            ]
+        );
+        
+    }
+    
+    function _ptm_level(
+        $tm,
+        $level = 1
+    ) {
+        
+        global $wpdb;
+        
+        return $wpdb->update(
+            $wpdb->prefix . 'tournament',
+            [ 'tm_level' => $level ],
+            [ 'tm_id' => $tm->tm_id ]
+        );
         
     }
     
