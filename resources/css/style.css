@@ -393,6 +393,17 @@ card.spades::before {
     align-self: center;
 }
 
+.ptm_live_table seat .bet .bet_action {
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var( --ptm-good );
+}
+
+.ptm_live_table seat .bet .bet_call {
+    text-transform: uppercase;
+    color: var( --ptm-bad );
+}
+
 .ptm_live_table seat .holecards {
     grid-area: cards;
     justify-self: end;
@@ -467,6 +478,10 @@ card.spades::before {
 
 .ptm_live_table seat.fold .actions {
     pointer-events: none;
+}
+
+.ptm_live_table seat.fold .actions :not([name="fold"]) {
+    display: none;
 }
 
 .ptm_live_table seat[data-s="1"] {

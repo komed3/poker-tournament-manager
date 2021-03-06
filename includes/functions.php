@@ -220,6 +220,47 @@
         
     }
     
+    function _ptm_action(
+        $table = null,
+        $hand = null,
+        $profile = null,
+        $action = null,
+        $bet = null
+    ) {
+        
+        global $wpdb;
+        
+        return $wpdb->insert(
+            $wpdb->prefix . 'action',
+            [
+                'a_table' => $table,
+                'a_hand' => $hand,
+                'a_profile' => $profile,
+                'a_action' => $action,
+                'a_bet' => $bet
+            ]
+        );
+        
+    }
+    
+    function _ptm_reset_action(
+        $table = null,
+        $hand = null
+    ) {
+        
+        global $wpdb;
+        
+        return $wpdb->update(
+            $wpdb->prefix . 'action',
+            [ 'a_active' => false ],
+            [
+                'a_table' => $table,
+                'a_hand' => $hand
+            ]
+        );
+        
+    }
+    
     function _ptm_bet(
         $tm,
         $table = null,
@@ -288,6 +329,14 @@
             AND     h_hand = ' . $hand
         );
         
+        $wpdb->query( '
+            UPDATE  ' . $wpdb->prefix . 'hand
+            SET     h_rbet = ' . $bet . ',
+            WHERE   h_table = ' . $table->t_id . '
+            AND     h_hand = ' . $hand . '
+            AND     h_rbet < ' . $bet
+        );
+        
         return true;
         
     }
@@ -323,6 +372,8 @@
         
         global $wpdb;
         
+        _ptm_action( $table, $hand, $profile, 'fold' );
+        
         return $wpdb->update(
             $wpdb->prefix . 'holecards',
             [ 'hc_fold' => true ],
@@ -345,13 +396,16 @@
         
         global $wpdb;
         
+        _ptm_reset_action( $table, $hand );
+        
         return $wpdb->update(
             $wpdb->prefix . 'hand',
             [
                 'h_flop_1' => $card1,
                 'h_flop_2' => $card2,
                 'h_flop_3' => $card3,
-                'h_rpot' => 0
+                'h_rpot' => 0,
+                'h_rbet' => 0
             ],
             [
                 'h_table' => $table,
@@ -369,11 +423,14 @@
         
         global $wpdb;
         
+        _ptm_reset_action( $table, $hand );
+        
         return $wpdb->update(
             $wpdb->prefix . 'hand',
             [
                 'h_turn' => $card,
-                'h_rpot' => 0
+                'h_rpot' => 0,
+                'h_rbet' => 0
             ],
             [
                 'h_table' => $table,
@@ -391,11 +448,14 @@
         
         global $wpdb;
         
+        _ptm_reset_action( $table, $hand );
+        
         return $wpdb->update(
             $wpdb->prefix . 'hand',
             [
                 'h_river' => $card,
-                'h_rpot' => 0
+                'h_rpot' => 0,
+                'h_rbet' => 0
             ],
             [
                 'h_table' => $table,
@@ -412,6 +472,8 @@
     ) {
         
         global $wpdb;
+        
+        _ptm_reset_action( $table, $hand );
         
         return $wpdb->update(
             $wpdb->prefix . 'hand',

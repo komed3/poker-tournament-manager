@@ -129,6 +129,22 @@
                 
                 _ptm_bet( $tm, $table, $hand->h_hand, $_POST['seat'], $_POST['value'] );
                 
+                _ptm_action( $table->t_id, $hand->h_hand, $_POST['profile'], 'bet', $_POST['value'] );
+                
+            }
+            
+            else if( isset( $_POST['call'] ) ) {
+                
+                _ptm_bet( $tm, $table, $hand->h_hand, $_POST['seat'], $_POST['cvalue'] );
+                
+                _ptm_action( $table->t_id, $hand->h_hand, $_POST['profile'], 'call', $_POST['cvalue'] );
+                
+            }
+            
+            else if( isset( $_POST['check'] ) ) {
+                
+                _ptm_action( $table->t_id, $hand->h_hand, $_POST['profile'], 'check' );
+                
             }
             
             else if( isset( $_POST['fold'] ) ) {
@@ -168,6 +184,26 @@
             $pot_select[ $seat->s_seat ] = '<label for="h_pot_' . $seat->s_seat . '">' . $seat->p_name . '</label>
             <input type="number" id="h_pot_' . $seat->s_seat . '" name="pot_' . $seat->s_seat . '" min="0" max="' . $hand->h_pot . '" value="0" />';
             
+            $action = $wpdb->get_row( '
+                SELECT      *
+                FROM        ' . $wpdb->prefix . 'action
+                WHERE       a_table = ' . $table->t_id . '
+                AND         a_hand = ' . $hand->h_hand . '
+                AND         a_profile = ' . $seat->p_id . '
+                AND         a_active = true
+                ORDER BY    a_id DESC
+                LIMIT       0, 1
+            ' );
+            
+            $bet = $wpdb->get_row( '
+                SELECT  SUM( a_bet ) AS bet
+                FROM    ' . $wpdb->prefix . 'action
+                WHERE   a_table = ' . $table->t_id . '
+                AND     a_hand = ' . $hand->h_hand . '
+                AND     a_profile = ' . $seat->p_id . '
+                AND     a_active = true
+            ' )->bet;
+            
             $holecards = $wpdb->get_row( '
                 SELECT  *
                 FROM    ' . $wpdb->prefix . 'holecards
@@ -189,7 +225,12 @@
                     <span>' . number_format_i18n( $seat->s_stack / $stats->chips * 100, 1 ) . '&nbsp;%</span>
                     <span>' . _ptm_ordinal( $i ) . __( ' in chips', 'ptm' ) . '</span>
                 </div>
-                <div class="bet"></div>
+                <div class="bet">
+                    <span class="bet_action">' . __( $action->a_action, 'ptm' ) . '</span>
+                    <span class="bet_bet">' . _ptm_stack( $action->a_bet ) . '</span>
+                    <span class="bet_call">' . ( $hand->h_rbet - $bet > 0 && $action->a_action != 'fold' ?
+                        _ptm_stack( $hand->h_rbet - $bet ) . __( ' to call', 'ptm' ) : '' ) . '</span>
+                </div>
                 <div class="holecards">
                     <cc>' . _ptm_card( $holecards->hc_1 ) . '</cc>
                     <cc>' . _ptm_card( $holecards->hc_2 ) . '</cc>
@@ -197,10 +238,12 @@
                 <form action="' . $_SERVER['REQUEST_URI'] . '" method="post" class="actions">
                     <input type="hidden" name="seat" value="' . $seat->s_seat . '" />
                     <input type="hidden" name="profile" value="' . $seat->s_profile . '" />
-                    <input type="number" name="value" min="0" max="' . $seat->s_stack . '" />
+                    <input type="hidden" name="cvalue" value="' . ( $hand->h_rbet - $bet ) . '" />
+                    <input type="number" name="value" min="' . ( $hand->h_rbet - $bet ) . '" max="' . $seat->s_stack . '" value="" />
                     <button type="submit" name="bet" value="1">' . __( 'Bet', 'ptm' ) . '</button>
-                    <!--<button type="submit" name="call" value="1">' . __( 'Call', 'ptm' ) . '</button>
-                    <button type="submit" name="check" value="1">' . __( 'Check', 'ptm' ) . '</button>-->
+                    ' . ( $hand->h_rbet - $bet > 0 ? '' : '<button type="submit" name="check" value="1">' . __( 'Check', 'ptm' ) . '</button>' ) . '
+                    <button type="submit" name="call" value="1">' . __( 'Call', 'ptm' ) . '</button>
+                    <button type="submit" name="allin" value="1">' . __( 'All-In', 'ptm' ) . '</button>
                     <button type="submit" name="fold" value="1">' . __( 'Fold', 'ptm' ) . '</button>
                 </form>
             </seat>';
